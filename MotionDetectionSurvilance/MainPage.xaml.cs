@@ -22,9 +22,17 @@ namespace MotionDetectionSurvilance
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private MotionCamera motionCamera;
+
         public MainPage()
         {
             this.InitializeComponent();
+            motionCamera = new MotionCamera(PreviewControl,Status, Dispatcher);
+        }
+
+        private void StartPreview_Click(object sender, RoutedEventArgs e)
+        {
+            motionCamera.StartPreviewAsync();
         }
     }
 }

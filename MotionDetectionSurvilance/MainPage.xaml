@@ -9,6 +9,26 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="433"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            
+            <StackPanel Orientation="Vertical">
+                <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_Click"/>
+            </StackPanel>
+
+            <TextBlock Grid.Row="1" Name="Status" Text="Hello" HorizontalAlignment="Center"/>
+        </Grid>
+
+        <CaptureElement Grid.Column="1" Name="PreviewControl" Stretch="Uniform"/>
+
 
     </Grid>
 </Page>

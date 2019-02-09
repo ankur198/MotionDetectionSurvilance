@@ -10,7 +10,7 @@
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="433"/>
+            <ColumnDefinition Width="auto"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
@@ -21,11 +21,11 @@
             </Grid.RowDefinitions>
             
             <StackPanel Orientation="Vertical">
-                <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_Click"/>
-                <ListView Name="CamerasList" ItemsSource="{x:Bind Cameras}">
+                <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_Click" Margin="10"/>
+                <ListView Name="CamerasList" ItemsSource="{x:Bind CameraSettings.Cameras}">
                     <ListView.ItemTemplate>
-                        <DataTemplate x:DataType="local:Camera">
-                            <TextBlock Text="{x:Bind deviceInformation.Name}"/>
+                        <DataTemplate x:DataType="local:CameraInformation">
+                            <TextBlock Text="{x:Bind deviceInformation.Name}" Margin="10"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>

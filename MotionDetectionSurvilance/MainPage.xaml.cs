@@ -24,28 +24,22 @@ namespace MotionDetectionSurvilance
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private MotionCamera motionCamera;
-        private ObservableCollection<Camera> Cameras = new ObservableCollection<Camera>();
+        private CameraSettings CameraSettings;
 
         public MainPage()
         {
             this.InitializeComponent();
-            motionCamera = new MotionCamera(PreviewControl, Status, Dispatcher);
-            ShowCameraListAsync();
+
+            CameraSettings = new CameraSettings(PreviewControl, Status, Dispatcher);
+            CameraSettings.ShowCameraListAsync();
+
         }
 
         private void StartPreview_Click(object sender, RoutedEventArgs e)
         {
-            motionCamera.StartPreviewAsync();
+            CameraSettings.cameraPreview.StartPreviewAsync();
         }
 
-        private async void ShowCameraListAsync()
-        {
-            var devices = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
-            foreach (var device in devices)
-            {
-                Cameras.Add(new Camera() { deviceInformation = device });
-            }
-        }
+
     }
 }

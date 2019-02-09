@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Enumeration;
+using Windows.Media.Capture;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 
@@ -15,6 +16,9 @@ namespace MotionDetectionSurvilance
         private readonly CaptureElement previewControl;
         private readonly TextBlock status;
         private readonly CoreDispatcher dispatcher;
+
+        internal MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings();
+
 
         internal CameraInformation cameraInformation;
         internal CameraPreview cameraPreview;
@@ -38,6 +42,11 @@ namespace MotionDetectionSurvilance
             this.dispatcher = dispatcher;
 
             cameraPreview = new CameraPreview(previewControl, status, dispatcher);
+        }
+
+        internal void StartPreview()
+        {
+            cameraPreview.StartPreviewAsync(settings);
         }
     }
 }

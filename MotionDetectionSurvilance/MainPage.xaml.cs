@@ -7,6 +7,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media.Capture;
+using Windows.Media.Capture.Frames;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -32,6 +34,7 @@ namespace MotionDetectionSurvilance
 
             CameraSettings = new CameraSettings(PreviewControl, Status, Dispatcher);
             CameraSettings.ShowCameraListAsync();
+            CamerasList.SelectedIndex = 0;
             CameraSettings.cameraPreview.PreviewStatusChanged += CameraPreview_PreviewStatusChanged;
         }
 
@@ -43,7 +46,10 @@ namespace MotionDetectionSurvilance
 
         private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
         {
-            CameraSettings.cameraPreview.StartPreviewAsync();
+            var selectedCamera = CamerasList.SelectedItem as CameraInformation;
+            CameraSettings.settings.VideoDeviceId = selectedCamera.deviceInformation.Id;
+
+            CameraSettings.StartPreview();
         }
     }
 }

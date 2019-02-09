@@ -21,6 +21,7 @@ namespace MotionDetectionSurvilance
         private CoreDispatcher dispatcher;
         private CaptureElement previewControl;
         private TextBlock status;
+        private MediaCaptureInitializationSettings settings;
 
         internal event EventHandler<bool> PreviewStatusChanged;
 
@@ -31,8 +32,9 @@ namespace MotionDetectionSurvilance
             this.status = status;
         }
 
-        internal async void StartPreviewAsync()
+        internal async void StartPreviewAsync(MediaCaptureInitializationSettings settings)
         {
+            this.settings = settings;
             if (!isPreviewing)
             {
                 await startPreviewAsync();
@@ -50,7 +52,7 @@ namespace MotionDetectionSurvilance
             try
             {
                 mediaCapture = new MediaCapture();
-                await mediaCapture.InitializeAsync();
+                await mediaCapture.InitializeAsync(settings);
 
 
                 displayRequest = new DisplayRequest();

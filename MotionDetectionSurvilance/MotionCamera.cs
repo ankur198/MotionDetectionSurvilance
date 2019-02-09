@@ -22,6 +22,8 @@ namespace MotionDetectionSurvilance
         private CaptureElement previewControl;
         private TextBlock status;
 
+        internal event EventHandler<bool> PreviewStatusChanged;
+
         public CameraPreview(CaptureElement previewControl, TextBlock status, CoreDispatcher dispatcher)
         {
             this.dispatcher = dispatcher;
@@ -39,6 +41,8 @@ namespace MotionDetectionSurvilance
             {
                 await CleanupCameraAsync();
             }
+
+            PreviewStatusChanged?.Invoke(this, isPreviewing);
         }
 
         private async Task startPreviewAsync()

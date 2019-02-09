@@ -38,7 +38,6 @@ namespace MotionDetectionSurvilance
             this.dispatcher = dispatcher;
 
             cameraPreview = new CameraPreview(previewControl, status, dispatcher);
-
         }
     }
 }

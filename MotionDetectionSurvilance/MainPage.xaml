@@ -19,9 +19,9 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
-            
+
             <StackPanel Orientation="Vertical">
-                <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_Click" Margin="10"/>
+                <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_ClickAsync" Margin="10"/>
                 <ListView Name="CamerasList" ItemsSource="{x:Bind CameraSettings.Cameras}">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="local:CameraInformation">

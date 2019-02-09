@@ -32,14 +32,18 @@ namespace MotionDetectionSurvilance
 
             CameraSettings = new CameraSettings(PreviewControl, Status, Dispatcher);
             CameraSettings.ShowCameraListAsync();
-
+            CameraSettings.cameraPreview.PreviewStatusChanged += CameraPreview_PreviewStatusChanged;
         }
 
-        private void StartPreview_Click(object sender, RoutedEventArgs e)
+        private void CameraPreview_PreviewStatusChanged(object sender, bool preview)
+        {
+            StartPreview.Content = $"{(preview ? "Stop" : "Start")} preview";
+            CamerasList.IsEnabled = !preview;
+        }
+
+        private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
         {
             CameraSettings.cameraPreview.StartPreviewAsync();
         }
-
-
     }
 }

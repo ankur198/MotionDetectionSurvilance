@@ -22,6 +22,13 @@
             
             <StackPanel Orientation="Vertical">
                 <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_Click"/>
+                <ListView Name="CamerasList" ItemsSource="{x:Bind Cameras}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="local:Camera">
+                            <TextBlock Text="{x:Bind deviceInformation.Name}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </StackPanel>
 
             <TextBlock Grid.Row="1" Name="Status" Text="Hello" HorizontalAlignment="Center"/>

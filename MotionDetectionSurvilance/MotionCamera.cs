@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
+using Windows.Graphics.Imaging;
 using Windows.Media.Capture;
+using Windows.Media.MediaProperties;
 using Windows.System.Display;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
@@ -22,6 +24,7 @@ namespace MotionDetectionSurvilance
         private CaptureElement previewControl;
         private TextBlock status;
         private MediaCaptureInitializationSettings settings;
+        private LowLagPhotoCapture lowLagCapture;
 
         internal event EventHandler<bool> PreviewStatusChanged;
 
@@ -30,6 +33,23 @@ namespace MotionDetectionSurvilance
             this.dispatcher = dispatcher;
             this.previewControl = previewControl;
             this.status = status;
+        }
+
+        internal async Task<SoftwareBitmap> CaptureImage()
+        {
+            if (isPreviewing)
+            {
+                lowLagCapture = await mediaCapture.PrepareLowLagPhotoCaptureAsync(ImageEncodingProperties.CreateUncompressed(MediaPixelFormat.Bgra8));
+
+                var capturedPhoto = await lowLagCapture.CaptureAsync();
+
+                var softwareBitmap = capturedPhoto.Frame.SoftwareBitmap;
+
+
+                return softwareBitmap;
+            }
+
+            return null;
         }
 
         internal async void StartPreviewAsync(MediaCaptureInitializationSettings settings)
@@ -106,8 +126,9 @@ namespace MotionDetectionSurvilance
                     await mediaCapture.StopPreviewAsync();
                 }
 
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
+                    await lowLagCapture.FinishAsync();
                     previewControl.Source = null;
                     if (displayRequest != null)
                     {

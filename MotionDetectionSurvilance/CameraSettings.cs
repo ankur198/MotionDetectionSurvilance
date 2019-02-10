@@ -20,7 +20,8 @@ namespace MotionDetectionSurvilance
         internal MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings();
 
 
-        internal CameraInformation cameraInformation;
+        //internal CameraInformation cameraInformation;
+
         internal CameraPreview cameraPreview;
 
         public ObservableCollection<CameraInformation> Cameras { get; private set; }

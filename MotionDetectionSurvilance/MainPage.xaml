@@ -29,6 +29,9 @@
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+
+                <Button Name="BtnCapture" Content="Capture" HorizontalAlignment="Center" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
+
             </StackPanel>
 
             <TextBlock Grid.Row="1" Name="Status" Text="Hello" HorizontalAlignment="Center"/>

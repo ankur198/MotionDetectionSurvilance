@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Graphics.Imaging;
 using Windows.Media.Capture;
 using Windows.Media.Capture.Frames;
 using Windows.UI.Xaml;
@@ -27,6 +28,8 @@ namespace MotionDetectionSurvilance
     public sealed partial class MainPage : Page
     {
         private CameraSettings CameraSettings;
+        private SoftwareBitmap oldImg;
+
 
         public MainPage()
         {
@@ -42,6 +45,7 @@ namespace MotionDetectionSurvilance
         {
             StartPreview.Content = $"{(preview ? "Stop" : "Start")} preview";
             CamerasList.IsEnabled = !preview;
+            BtnCapture.IsEnabled = preview;
         }
 
         private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
@@ -50,6 +54,22 @@ namespace MotionDetectionSurvilance
             CameraSettings.settings.VideoDeviceId = selectedCamera.deviceInformation.Id;
 
             CameraSettings.StartPreview();
+        }
+
+        private async void BtnCapture_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: make it to click image automatically
+            var image = await CameraSettings.cameraPreview.CaptureImage();
+
+            if (oldImg == null)
+            {
+                oldImg = image;
+            }
+            else
+            {
+                Status.Text = new MotionDetector().ComputeDifference(oldImg, image).ToString();
+                oldImg = image;
+            }
         }
     }
 }

@@ -6,17 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    xmlns:telerikChart="using:Telerik.UI.Xaml.Controls.Chart"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*" MinWidth="301"/>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Grid Margin="20">
+        <Grid Margin="20,20,20,20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition/>
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
 
@@ -32,12 +34,37 @@
 
                 <Button Name="BtnCapture" Content="Capture" HorizontalAlignment="Center" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
 
+                <Slider Name="Threshold" Minimum="0" Maximum="200" Value="{x:Bind threshold,Mode=TwoWay}" Margin="10" Header="De-noise" StepFrequency="5" />
+
+                <Slider Header="Multiplier" Minimum="100" Maximum="5000" StepFrequency="100" Value="{x:Bind smooth,Mode=TwoWay}" Margin="10"/>
+
             </StackPanel>
 
-            <TextBlock Grid.Row="1" Name="Status" Text="Hello" HorizontalAlignment="Center"/>
+            <telerikChart:RadCartesianChart Grid.Row="1" Name="ChartDiagnostic">
+                <telerikChart:RadCartesianChart.HorizontalAxis>
+                    <telerikChart:CategoricalAxis/>
+                </telerikChart:RadCartesianChart.HorizontalAxis>
+                <telerikChart:RadCartesianChart.VerticalAxis>
+                    <telerikChart:LinearAxis/>
+                </telerikChart:RadCartesianChart.VerticalAxis>
+                <telerikChart:LineSeries ItemsSource="{Binding}" 
+                               CombineMode="Stack"/>
+                <!--<telerikChart:LineSeries ItemsSource="{Binding Data2}" 
+                               CombineMode="Stack"/>-->
+
+            </telerikChart:RadCartesianChart>
+
+            <TextBlock Grid.Row="2" Name="Status" Text="Hello" HorizontalAlignment="Center"/>
         </Grid>
 
-        <CaptureElement Grid.Column="1" Name="PreviewControl" Stretch="Uniform"/>
+        <Grid Grid.Column="1" HorizontalAlignment="Stretch" Margin="0,0,0,0" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <CaptureElement Name="PreviewControl" Stretch="Uniform"/>
+            <Image Grid.Row="1" Name="ImgPreview"/>
+        </Grid>
 
 
     </Grid>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
@@ -39,9 +40,9 @@ namespace MotionDetectionSurvilance
         {
             if (isPreviewing)
             {
-                lowLagCapture = await mediaCapture.PrepareLowLagPhotoCaptureAsync(ImageEncodingProperties.CreateUncompressed(MediaPixelFormat.Bgra8));
+                CapturedPhoto capturedPhoto = null;
 
-                var capturedPhoto = await lowLagCapture.CaptureAsync();
+                capturedPhoto = await lowLagCapture.CaptureAsync();
 
                 var softwareBitmap = capturedPhoto.Frame.SoftwareBitmap;
 
@@ -78,6 +79,7 @@ namespace MotionDetectionSurvilance
                 displayRequest = new DisplayRequest();
                 displayRequest.RequestActive();
                 DisplayInformation.AutoRotationPreferences = DisplayOrientations.Landscape;
+                lowLagCapture = await mediaCapture.PrepareLowLagPhotoCaptureAsync(ImageEncodingProperties.CreateUncompressed(MediaPixelFormat.Bgra8));
             }
             catch (UnauthorizedAccessException)
             {
@@ -128,7 +130,10 @@ namespace MotionDetectionSurvilance
 
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                 {
-                    await lowLagCapture.FinishAsync();
+                if (lowLagCapture != null)
+                    {
+                        await lowLagCapture.FinishAsync(); 
+                    }
                     previewControl.Source = null;
                     if (displayRequest != null)
                     {

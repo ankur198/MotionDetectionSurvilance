@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MotionDetectionSurvilance.Web;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -38,9 +39,12 @@ namespace MotionDetectionSurvilance
         private int threshold;
         private int smooth;
 
+        private NetworkManager NetworkManager;
+
         public MainPage()
         {
             this.InitializeComponent();
+            myDispatcher = Dispatcher;
 
             threshold = 25;
             smooth = 10;
@@ -52,6 +56,32 @@ namespace MotionDetectionSurvilance
 
             MotionDataCollection = new MotionDataCollection();
             ChartDiagnostic.DataContext = MotionDataCollection.MotionValue;
+
+            //var net = new NetworkManager();
+            //net.Start();
+
+            //new MyWebServer().Start();
+
+            NetworkManager = new NetworkManager();
+            NetworkManager.Start();
+
+            NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
+
+        }
+
+        private async void NetworkManager_UpdateSettings(object sender, Settings e)
+        {
+            await runOnUIThread(() =>
+            {
+                if (e.SettingName == SettingName.Noise)
+                {
+                    Noise.Value = e.Value;
+                }
+                else if (e.SettingName == SettingName.Multiplier)
+                {
+                    Multiplier.Value = e.Value;
+                }
+            });
         }
 
         private void CameraPreview_PreviewStatusChanged(object sender, bool preview)
@@ -64,12 +94,17 @@ namespace MotionDetectionSurvilance
         private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
         {
             var selectedCamera = CamerasList.SelectedItem as CameraInformation;
+            if (selectedCamera==null)
+            {
+                Status.Text = "No camera selected/found";
+                return;
+            }
             CameraSettings.settings.VideoDeviceId = selectedCamera.deviceInformation.Id;
 
             CameraSettings.StartPreview();
         }
 
-        private async void BtnCapture_Click(object sender, RoutedEventArgs e)
+        private void BtnCapture_Click(object sender, RoutedEventArgs e)
         {
             //TODO: make it to click image automatically
 
@@ -104,6 +139,7 @@ namespace MotionDetectionSurvilance
 
         private SoftwareBitmap image;
 
+
         private async Task CaptureImage()
         {
             image = await CameraSettings.cameraPreview.CaptureImage();
@@ -135,9 +171,12 @@ namespace MotionDetectionSurvilance
             }
         }
 
-        private async Task runOnUIThread(DispatchedHandler d)
+        private static CoreDispatcher myDispatcher;
+
+
+        public static async Task runOnUIThread(DispatchedHandler d)
         {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, d);
+            await myDispatcher.RunAsync(CoreDispatcherPriority.Normal, d);
         }
     }
 }

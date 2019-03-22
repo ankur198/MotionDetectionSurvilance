@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.271
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28714.193
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotionDetectionSurvilance", "MotionDetectionSurvilance\MotionDetectionSurvilance.csproj", "{7AD3933F-F665-4597-A6BF-F17F00C7C8EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testSocket", "testSocket\testSocket.csproj", "{AA38D374-598F-45B1-823A-2CAE75533436}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,6 +43,30 @@ Global
 		{7AD3933F-F665-4597-A6BF-F17F00C7C8EA}.Release|x86.ActiveCfg = Release|x86
 		{7AD3933F-F665-4597-A6BF-F17F00C7C8EA}.Release|x86.Build.0 = Release|x86
 		{7AD3933F-F665-4597-A6BF-F17F00C7C8EA}.Release|x86.Deploy.0 = Release|x86
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|ARM.ActiveCfg = Debug|ARM
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|ARM.Build.0 = Debug|ARM
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|ARM.Deploy.0 = Debug|ARM
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|ARM64.Build.0 = Debug|ARM64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|x64.ActiveCfg = Debug|x64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|x64.Build.0 = Debug|x64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|x64.Deploy.0 = Debug|x64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|x86.ActiveCfg = Debug|x86
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|x86.Build.0 = Debug|x86
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Debug|x86.Deploy.0 = Debug|x86
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|ARM.ActiveCfg = Release|ARM
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|ARM.Build.0 = Release|ARM
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|ARM.Deploy.0 = Release|ARM
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|ARM64.ActiveCfg = Release|ARM64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|ARM64.Build.0 = Release|ARM64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|ARM64.Deploy.0 = Release|ARM64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|x64.ActiveCfg = Release|x64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|x64.Build.0 = Release|x64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|x64.Deploy.0 = Release|x64
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|x86.ActiveCfg = Release|x86
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|x86.Build.0 = Release|x86
+		{AA38D374-598F-45B1-823A-2CAE75533436}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

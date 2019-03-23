@@ -38,6 +38,7 @@ namespace MotionDetectionSurvilance
         private MotionDataCollection MotionDataCollection;
         private int threshold;
         private int smooth;
+        private MotionDetector MotionDetector;
 
         private NetworkManager NetworkManager;
 
@@ -57,10 +58,7 @@ namespace MotionDetectionSurvilance
             MotionDataCollection = new MotionDataCollection();
             ChartDiagnostic.DataContext = MotionDataCollection.MotionValue;
 
-            //var net = new NetworkManager();
-            //net.Start();
-
-            //new MyWebServer().Start();
+            MotionDetector = new MotionDetector();
 
             NetworkManager = new NetworkManager();
             NetworkManager.Start();
@@ -94,7 +92,7 @@ namespace MotionDetectionSurvilance
         private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
         {
             var selectedCamera = CamerasList.SelectedItem as CameraInformation;
-            if (selectedCamera==null)
+            if (selectedCamera == null)
             {
                 Status.Text = "No camera selected/found";
                 return;
@@ -127,7 +125,6 @@ namespace MotionDetectionSurvilance
                 while (isMonitoring)
                 {
                     await CaptureImage();
-                    //Thread.Sleep(1000);
                 }
             }
             catch (Exception e)
@@ -137,40 +134,35 @@ namespace MotionDetectionSurvilance
             }
         }
 
-        private SoftwareBitmap image;
+        private SoftwareBitmap newImage;
 
 
         private async Task CaptureImage()
         {
-            image = await CameraSettings.cameraPreview.CaptureImage();
+            //capture new image
+            newImage = await CameraSettings.cameraPreview.CaptureImage();
 
-            if (image != null)
+            if (newImage != null)
             {
                 if (oldImg == null)
                 {
-                    oldImg = image;
+                    oldImg = newImage;
                 }
 
-                var result = await Task.Factory.StartNew(() => new MotionDetector().ComputeDifference(oldImg, image, threshold, smooth));
-                result.Difference = result.Difference / smooth;
+                var result = await Task.Factory.StartNew(() => MotionDetector.ComputeDifference(oldImg, newImage, threshold, smooth));
+
                 Status.Text = result.Difference.ToString();
+                MotionDataCollection.AddMotion(result.Difference);
 
-                MotionDataCollection.AddMotion(Math.Abs(result.Difference));
-
-                oldImg = result.Image;
-
-                image = SoftwareBitmap.Convert(result.Image, BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+                oldImg = newImage; //update old image
 
                 var source = new SoftwareBitmapSource();
-
-                await source.SetBitmapAsync(image);
-
+                await source.SetBitmapAsync(result.Image);
                 ImgPreview.Source = source;
             }
         }
 
         private static CoreDispatcher myDispatcher;
-
 
         public static async Task runOnUIThread(DispatchedHandler d)
         {

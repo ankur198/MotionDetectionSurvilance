@@ -156,8 +156,6 @@ namespace MotionDetectionSurvilance
                 Status.Text = result.Difference.ToString();
 
                 MotionDataCollection.AddMotion(Math.Abs(result.Difference));
-                //ChartDiagnostic.DataContext = MotionDataCollection.MotionValue;
-                //ChartDiagnostic.UpdateLayout();
 
                 oldImg = result.Image;
 

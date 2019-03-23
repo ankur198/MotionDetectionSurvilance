@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Graphics.Imaging;
 using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
@@ -15,6 +16,7 @@ namespace MotionDetectionSurvilance.Web
 {
     public class NetworkManager
     {
+        internal SoftwareBitmap Image;
         const string PORT = "8081";
 
         private const uint BufferSize = 8192;
@@ -27,9 +29,11 @@ namespace MotionDetectionSurvilance.Web
             {
                 var listener = new StreamSocketListener();
 
-                await listener.BindServiceNameAsync(PORT);
+                //listener.ConnectionReceived += async (sender, args) => { await OnConnection(sender, args); };
+                listener.Control.QualityOfService = SocketQualityOfService.LowLatency;
+                listener.ConnectionReceived += OnConnection;
 
-                listener.ConnectionReceived += async (sender, args) => { await OnConnection(sender, args); };
+                await listener.BindServiceNameAsync(PORT);
             }
             catch (Exception ex)
             {
@@ -38,7 +42,7 @@ namespace MotionDetectionSurvilance.Web
             }
         }
 
-        private async Task OnConnection(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+        private async void OnConnection(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
         {
             var request = new StringBuilder();
 
@@ -66,18 +70,35 @@ namespace MotionDetectionSurvilance.Web
                 using (var response = output.AsStreamForWrite())
                 {
                     var html = Encoding.UTF8.GetBytes(
-                    $"<html><head><title>Background Message</title></head><body>Hello from motion!<br/>{query}</body></html>");
+                    $"<html><head><title>Background Message</title></head><body>Hello from motion!<br/>{query}<br/>" +
+                    $"{(Image != null ? SendImage() : "")}</body></html>");
                     using (var bodyStream = new MemoryStream(html))
                     {
                         var header = $"HTTP/1.1 200 OK\r\nContent-Length: {bodyStream.Length}\r\nConnection: close\r\n\r\n";
                         var headerArray = Encoding.UTF8.GetBytes(header);
                         await response.WriteAsync(headerArray,
                                                   0, headerArray.Length);
+
+
                         await bodyStream.CopyToAsync(response);
                         await response.FlushAsync();
                     }
                 }
             }
+        }
+
+        private string SendImage()
+        {
+            if (Image == null)
+            {
+                return "";
+            }
+            byte[] buffer = new Byte[4 * Image.PixelHeight * Image.PixelWidth];
+            Image.CopyToBuffer(buffer.AsBuffer());
+
+            var x = Convert.ToBase64String(buffer);
+
+            return x;
         }
 
         private void ProcessQuery(string query)
@@ -104,6 +125,7 @@ namespace MotionDetectionSurvilance.Web
 
         private static IDictionary<string, string> FormatQuery(string query)
         {
+
             query = query.TrimStart('?');
             query = query.Replace("&&", "&");
             var individualQueries = query.Split("&");
@@ -112,6 +134,11 @@ namespace MotionDetectionSurvilance.Web
 
             foreach (var individualQuery in individualQueries)
             {
+                if (individualQuery.Length == 0)
+                {
+                    continue;
+                }
+
                 var y = individualQuery.Split("=");
                 formattedQueries.Add(y[0], y[1]);
             }

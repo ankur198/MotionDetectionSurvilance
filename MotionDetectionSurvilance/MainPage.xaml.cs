@@ -1,36 +1,15 @@
 ﻿using MotionDetectionSurvilance.Web;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics.Imaging;
-using Windows.Media.Capture;
-using Windows.Media.Capture.Frames;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace MotionDetectionSurvilance
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         private CameraSettings CameraSettings;
@@ -39,6 +18,8 @@ namespace MotionDetectionSurvilance
         private int threshold;
         private int smooth;
         private MotionDetector MotionDetector;
+
+        private MotionDetectorFactory MotionDetectorFactory;
 
         private NetworkManager NetworkManager;
 
@@ -61,10 +42,24 @@ namespace MotionDetectionSurvilance
             MotionDetector = new MotionDetector();
 
             NetworkManager = new NetworkManager();
-            NetworkManager.Start();
+
+            MotionDetectorFactory = new MotionDetectorFactory(CameraSettings, oldImg, NetworkManager,
+                MotionDetector, MotionDataCollection);
+
+            MotionDetectorFactory.ImageCaptured += MotionDetectorFactory_ImageCaptured;
+
+            
+
+            Task.Factory.StartNew(() => NetworkManager.Start());
+            //NetworkManager.Start();
 
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
 
+        }
+
+        private void MotionDetectorFactory_ImageCaptured(object sender, MotionResult e)
+        {
+            CaptureImage();
         }
 
         private async void NetworkManager_UpdateSettings(object sender, Settings e)
@@ -112,19 +107,19 @@ namespace MotionDetectionSurvilance
 
             if (isMonitoring)
             {
-                startCaptureImage();
+                CaptureImage();
             }
         }
 
         private bool isMonitoring = false;
 
-        private async void startCaptureImage()
+        private async void CaptureImage()
         {
             try
             {
-                while (isMonitoring)
+                if (isMonitoring)
                 {
-                    await CaptureImage();
+                   await Task.Factory.StartNew(()=> MotionDetectorFactory.CaptureImage(threshold, smooth));
                 }
             }
             catch (Exception e)
@@ -134,33 +129,7 @@ namespace MotionDetectionSurvilance
             }
         }
 
-        private SoftwareBitmap newImage;
 
-
-        private async Task CaptureImage()
-        {
-            //capture new image
-            newImage = await CameraSettings.cameraPreview.CaptureImage();
-
-            if (newImage != null)
-            {
-                if (oldImg == null)
-                {
-                    oldImg = newImage;
-                }
-
-                var result = await Task.Factory.StartNew(() => MotionDetector.ComputeDifference(oldImg, newImage, threshold, smooth));
-
-                Status.Text = result.Difference.ToString();
-                MotionDataCollection.AddMotion(result.Difference);
-
-                oldImg = newImage; //update old image
-
-                var source = new SoftwareBitmapSource();
-                await source.SetBitmapAsync(result.Image);
-                ImgPreview.Source = source;
-            }
-        }
 
         private static CoreDispatcher myDispatcher;
 

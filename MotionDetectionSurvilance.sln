@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.271
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28714.193
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MotionDetectionSurvilance", "MotionDetectionSurvilance\MotionDetectionSurvilance.csproj", "{7AD3933F-F665-4597-A6BF-F17F00C7C8EA}"
 EndProject

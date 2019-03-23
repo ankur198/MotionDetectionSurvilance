@@ -34,9 +34,9 @@
 
                 <Button Name="BtnCapture" Content="Capture" HorizontalAlignment="Center" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
 
-                <Slider Name="Threshold" Minimum="0" Maximum="200" Value="{x:Bind threshold,Mode=TwoWay}" Margin="10" Header="De-noise" StepFrequency="5" />
+                <Slider Name="Noise" Minimum="0" Maximum="200" Value="{x:Bind threshold,Mode=TwoWay}" Margin="10" Header="De-noise" StepFrequency="5" />
 
-                <Slider Header="Multiplier" Minimum="100" Maximum="5000" StepFrequency="100" Value="{x:Bind smooth,Mode=TwoWay}" Margin="10"/>
+                <Slider Name="Multiplier" Header="Multiplier" Minimum="100" Maximum="5000" StepFrequency="100" Value="{x:Bind smooth,Mode=TwoWay}" Margin="10"/>
 
             </StackPanel>
 

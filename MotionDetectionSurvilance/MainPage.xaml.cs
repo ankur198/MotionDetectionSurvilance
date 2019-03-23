@@ -1,35 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using MotionDetectionSurvilance.Web;
+using System;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Devices.Enumeration;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Graphics.Imaging;
-using Windows.Media.Capture;
-using Windows.Media.Capture.Frames;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
 
-// The Blank Page item template is documented at https://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace MotionDetectionSurvilance
 {
-    /// <summary>
-    /// An empty page that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainPage : Page
     {
         private CameraSettings CameraSettings;
@@ -37,10 +17,16 @@ namespace MotionDetectionSurvilance
         private MotionDataCollection MotionDataCollection;
         private int threshold;
         private int smooth;
+        private MotionDetector MotionDetector;
+
+        private MotionDetectorFactory MotionDetectorFactory;
+
+        private NetworkManager NetworkManager;
 
         public MainPage()
         {
             this.InitializeComponent();
+            myDispatcher = Dispatcher;
 
             threshold = 25;
             smooth = 10;
@@ -52,6 +38,43 @@ namespace MotionDetectionSurvilance
 
             MotionDataCollection = new MotionDataCollection();
             ChartDiagnostic.DataContext = MotionDataCollection.MotionValue;
+
+            MotionDetector = new MotionDetector();
+
+            NetworkManager = new NetworkManager();
+
+            MotionDetectorFactory = new MotionDetectorFactory(CameraSettings, oldImg, NetworkManager,
+                MotionDetector, MotionDataCollection);
+
+            MotionDetectorFactory.ImageCaptured += MotionDetectorFactory_ImageCaptured;
+
+            
+
+            Task.Factory.StartNew(() => NetworkManager.Start());
+            //NetworkManager.Start();
+
+            NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
+
+        }
+
+        private void MotionDetectorFactory_ImageCaptured(object sender, MotionResult e)
+        {
+            CaptureImage();
+        }
+
+        private async void NetworkManager_UpdateSettings(object sender, Settings e)
+        {
+            await runOnUIThread(() =>
+            {
+                if (e.SettingName == SettingName.Noise)
+                {
+                    Noise.Value = e.Value;
+                }
+                else if (e.SettingName == SettingName.Multiplier)
+                {
+                    Multiplier.Value = e.Value;
+                }
+            });
         }
 
         private void CameraPreview_PreviewStatusChanged(object sender, bool preview)
@@ -64,12 +87,17 @@ namespace MotionDetectionSurvilance
         private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
         {
             var selectedCamera = CamerasList.SelectedItem as CameraInformation;
+            if (selectedCamera == null)
+            {
+                Status.Text = "No camera selected/found";
+                return;
+            }
             CameraSettings.settings.VideoDeviceId = selectedCamera.deviceInformation.Id;
 
             CameraSettings.StartPreview();
         }
 
-        private async void BtnCapture_Click(object sender, RoutedEventArgs e)
+        private void BtnCapture_Click(object sender, RoutedEventArgs e)
         {
             //TODO: make it to click image automatically
 
@@ -79,20 +107,19 @@ namespace MotionDetectionSurvilance
 
             if (isMonitoring)
             {
-                startCaptureImage();
+                CaptureImage();
             }
         }
 
         private bool isMonitoring = false;
 
-        private async void startCaptureImage()
+        private async void CaptureImage()
         {
             try
             {
-                while (isMonitoring)
+                if (isMonitoring)
                 {
-                    await CaptureImage();
-                    //Thread.Sleep(1000);
+                   await Task.Factory.StartNew(()=> MotionDetectorFactory.CaptureImage(threshold, smooth));
                 }
             }
             catch (Exception e)
@@ -102,42 +129,13 @@ namespace MotionDetectionSurvilance
             }
         }
 
-        private SoftwareBitmap image;
 
-        private async Task CaptureImage()
+
+        private static CoreDispatcher myDispatcher;
+
+        public static async Task runOnUIThread(DispatchedHandler d)
         {
-            image = await CameraSettings.cameraPreview.CaptureImage();
-
-            if (image != null)
-            {
-                if (oldImg == null)
-                {
-                    oldImg = image;
-                }
-
-                var result = await Task.Factory.StartNew(() => new MotionDetector().ComputeDifference(oldImg, image, threshold, smooth));
-                result.Difference = result.Difference / smooth;
-                Status.Text = result.Difference.ToString();
-
-                MotionDataCollection.AddMotion(Math.Abs(result.Difference));
-                //ChartDiagnostic.DataContext = MotionDataCollection.MotionValue;
-                //ChartDiagnostic.UpdateLayout();
-
-                oldImg = result.Image;
-
-                image = SoftwareBitmap.Convert(result.Image, BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
-
-                var source = new SoftwareBitmapSource();
-
-                await source.SetBitmapAsync(image);
-
-                ImgPreview.Source = source;
-            }
-        }
-
-        private async Task runOnUIThread(DispatchedHandler d)
-        {
-            await Dispatcher.RunAsync(CoreDispatcherPriority.Normal, d);
+            await myDispatcher.RunAsync(CoreDispatcherPriority.Normal, d);
         }
     }
 }

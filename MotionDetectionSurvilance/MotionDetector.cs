@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
 
@@ -16,38 +17,36 @@ namespace MotionDetectionSurvilance
 
     internal class MotionDetector
     {
-        internal MotionResult ComputeDifference(SoftwareBitmap img1, SoftwareBitmap img2, int threshold, int smooth)
+
+        private int SmoothHeight;
+        private int SmoothWidth;
+
+        internal MotionResult ComputeDifference(SoftwareBitmap newImage, SoftwareBitmap oldImage, int threshold, int smooth)
         {
             SmoothHeight = smooth;
             SmoothWidth = smooth;
 
-            //var img1data = new ImageData(img1);
-            //var img2data = new ImageData(img2);
-            var img1data = new ImageData(img1);
-            //var smoothImg2 = SmoothImage(img2);
-            //var img2data = new ImageData(smoothImg2);
-            var img2data = new ImageData(img2);
+            var newImgdata = new ImageData(newImage);
+            var oldImgdata = new ImageData(oldImage);
 
-
-
-            //TODO: group pixels,get their avg difference and run for 3 filters in seperate thread
             var difference = 0;
-            for (int i = 0; i < img1data.blue.Length; i++)
+            for (int i = 0; i < newImgdata.blue.Length; i++)
             {
-                var pixeldifferenceR = img1data.red[i] - img2data.red[i];
-                var pixeldifferenceG = img1data.green[i] - img2data.green[i];
-                var pixeldifferenceB = img1data.blue[i] - img2data.blue[i];
+                var pixeldifferenceR = newImgdata.red[i] - oldImgdata.red[i];
+                var pixeldifferenceG = newImgdata.green[i] - oldImgdata.green[i];
+                var pixeldifferenceB = newImgdata.blue[i] - oldImgdata.blue[i];
 
                 var pixeldifference = (pixeldifferenceR + pixeldifferenceG + pixeldifferenceB) / 3;
                 difference += Math.Abs(pixeldifference) - threshold <= 0 ? 0 : pixeldifference - threshold;
             }
-            return new MotionResult() { Difference = difference, Image = img2 };
+
+            //formatting to make it visible for preview
+            oldImage = SoftwareBitmap.Convert(oldImage, BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+            difference = Math.Abs(difference / smooth);
+
+            return new MotionResult() { Difference = difference, Image = oldImage };
         }
 
-
-
-        private int SmoothHeight;
-        private int SmoothWidth;
         private SoftwareBitmap SmoothImage(SoftwareBitmap softwareBitmap)
         {
             var pixels = new ImageData(softwareBitmap);

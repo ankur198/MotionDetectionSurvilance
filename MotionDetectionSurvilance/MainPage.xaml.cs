@@ -6,7 +6,8 @@ using Windows.Graphics.Imaging;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-
+using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace MotionDetectionSurvilance
 {
@@ -48,7 +49,7 @@ namespace MotionDetectionSurvilance
 
             MotionDetectorFactory.ImageCaptured += MotionDetectorFactory_ImageCaptured;
 
-            
+
 
             Task.Factory.StartNew(() => NetworkManager.Start());
             //NetworkManager.Start();
@@ -59,7 +60,28 @@ namespace MotionDetectionSurvilance
 
         private void MotionDetectorFactory_ImageCaptured(object sender, MotionResult e)
         {
+            UpdatePrevToResult(e.Image);
+
             CaptureImage();
+        }
+
+        private async void UpdatePrevToResult(SoftwareBitmap image)
+        {
+            await runOnUIThread(async () =>
+            {
+                var softwareBitmap = image;
+                if (softwareBitmap.BitmapPixelFormat != BitmapPixelFormat.Bgra8 ||
+                            softwareBitmap.BitmapAlphaMode == BitmapAlphaMode.Straight)
+                {
+                    softwareBitmap = SoftwareBitmap.Convert(softwareBitmap, BitmapPixelFormat.Bgra8, BitmapAlphaMode.Premultiplied);
+                }
+
+                var source = new SoftwareBitmapSource();
+                await source.SetBitmapAsync(softwareBitmap);
+
+                // Set the source of the Image control
+                ImgPreview.Source = source;
+            });
         }
 
         private async void NetworkManager_UpdateSettings(object sender, Settings e)
@@ -119,7 +141,7 @@ namespace MotionDetectionSurvilance
             {
                 if (isMonitoring)
                 {
-                   await Task.Factory.StartNew(()=> MotionDetectorFactory.CaptureImage(threshold, smooth));
+                    await Task.Factory.StartNew(() => MotionDetectorFactory.CaptureImage(threshold, smooth));
                 }
             }
             catch (Exception e)

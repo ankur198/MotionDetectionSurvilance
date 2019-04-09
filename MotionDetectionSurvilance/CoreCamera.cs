@@ -11,16 +11,9 @@ using Windows.UI.Xaml.Controls;
 
 namespace MotionDetectionSurvilance
 {
-    internal class CameraSettings
+    internal class CoreCamera
     {
-        private readonly CaptureElement previewControl;
-        private readonly TextBlock status;
-        private readonly CoreDispatcher dispatcher;
-
         internal MediaCaptureInitializationSettings settings = new MediaCaptureInitializationSettings();
-
-
-        //internal CameraInformation cameraInformation;
 
         internal CameraPreview cameraPreview;
 
@@ -36,13 +29,10 @@ namespace MotionDetectionSurvilance
             }
         }
 
-        public CameraSettings(CaptureElement previewControl, TextBlock status, CoreDispatcher dispatcher)
+        public CoreCamera(CaptureElement previewControl)
         {
-            this.previewControl = previewControl;
-            this.status = status;
-            this.dispatcher = dispatcher;
-
-            cameraPreview = new CameraPreview(previewControl, status, dispatcher);
+            cameraPreview = new CameraPreview(previewControl);
+            this.ShowCameraListAsync();
         }
 
         internal void StartPreview()

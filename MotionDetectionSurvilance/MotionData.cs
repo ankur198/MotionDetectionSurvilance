@@ -17,7 +17,7 @@ namespace MotionDetectionSurvilance
 
     internal class MotionDataCollection
     {
-        private int maxCount = 60;
+        private int maxCount;
         public List<MotionData> motionDatas = new List<MotionData>();
         private ObservableCollection<int> datas = new ObservableCollection<int>();
 
@@ -30,8 +30,9 @@ namespace MotionDetectionSurvilance
             datas.RemoveAt(0);
         }
 
-        public MotionDataCollection()
+        public MotionDataCollection(int MaxCount)
         {
+            maxCount = MaxCount;
             for (int i = 0; i < maxCount; i++)
             {
                 datas.Add(0);

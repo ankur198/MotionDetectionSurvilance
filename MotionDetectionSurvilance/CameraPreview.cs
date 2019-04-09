@@ -21,19 +21,15 @@ namespace MotionDetectionSurvilance
 
         private DisplayRequest displayRequest;
 
-        private CoreDispatcher dispatcher;
         private CaptureElement previewControl;
-        private TextBlock status;
         private MediaCaptureInitializationSettings settings;
         private LowLagPhotoCapture lowLagCapture;
 
         internal event EventHandler<bool> PreviewStatusChanged;
 
-        public CameraPreview(CaptureElement previewControl, TextBlock status, CoreDispatcher dispatcher)
+        public CameraPreview(CaptureElement previewControl)
         {
-            this.dispatcher = dispatcher;
             this.previewControl = previewControl;
-            this.status = status;
         }
 
         internal async Task<SoftwareBitmap> CaptureImage()
@@ -83,7 +79,7 @@ namespace MotionDetectionSurvilance
             }
             catch (UnauthorizedAccessException)
             {
-                ShowMessageToUser("Unable to start");
+                MainPage.ShowMessage("Unable to start");
                 return;
             }
 
@@ -103,20 +99,12 @@ namespace MotionDetectionSurvilance
         {
             if (args.Status == MediaCaptureDeviceExclusiveControlStatus.SharedReadOnlyAvailable)
             {
-                ShowMessageToUser("The camera preview can't be displayed because another app has exclusive access");
+                MainPage.ShowMessage("The camera preview can't be displayed because another app has exclusive access");
             }
             else if (args.Status == MediaCaptureDeviceExclusiveControlStatus.ExclusiveControlAvailable && !isPreviewing)
             {
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                {
-                    await startPreviewAsync();
-                });
+                await MainPage.runOnUIThread(async () => { await startPreviewAsync(); });
             }
-        }
-
-        private void ShowMessageToUser(string v)
-        {
-            status.Text = v;
         }
 
         private async Task CleanupCameraAsync()
@@ -128,11 +116,11 @@ namespace MotionDetectionSurvilance
                     await mediaCapture.StopPreviewAsync();
                 }
 
-                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                await MainPage.runOnUIThread(async () =>
                 {
-                if (lowLagCapture != null)
+                    if (lowLagCapture != null)
                     {
-                        await lowLagCapture.FinishAsync(); 
+                        await lowLagCapture.FinishAsync();
                     }
                     previewControl.Source = null;
                     if (displayRequest != null)

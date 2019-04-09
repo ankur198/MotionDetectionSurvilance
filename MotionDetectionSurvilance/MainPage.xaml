@@ -24,7 +24,7 @@
 
             <StackPanel Orientation="Vertical">
                 <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_ClickAsync" Margin="10"/>
-                <ListView Name="CamerasList" ItemsSource="{x:Bind CameraSettings.Cameras}">
+                <ListView Name="CamerasList" ItemsSource="{x:Bind Camera.Cameras}">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="local:CameraInformation">
                             <TextBlock Text="{x:Bind deviceInformation.Name}" Margin="10"/>
@@ -40,7 +40,7 @@
 
             </StackPanel>
 
-            <telerikChart:RadCartesianChart Grid.Row="1" Name="ChartDiagnostic">
+            <telerikChart:RadCartesianChart Grid.Row="1" Name="MotionChart">
                 <telerikChart:RadCartesianChart.HorizontalAxis>
                     <telerikChart:CategoricalAxis/>
                 </telerikChart:RadCartesianChart.HorizontalAxis>

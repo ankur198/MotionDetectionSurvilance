@@ -13,12 +13,11 @@ namespace MotionDetectionSurvilance
 {
     public sealed partial class MainPage : Page
     {
-        private CameraSettings CameraSettings;
-        private SoftwareBitmap oldImg;
+        private CoreCamera Camera;
+        internal static SoftwareBitmap oldImg;
         private MotionDataCollection MotionDataCollection;
         private int threshold;
         private int smooth;
-        private MotionDetector MotionDetector;
 
         private MotionDetectorFactory MotionDetectorFactory;
 
@@ -28,34 +27,26 @@ namespace MotionDetectionSurvilance
         {
             this.InitializeComponent();
             myDispatcher = Dispatcher;
+            myStatus = Status;
 
             threshold = 25;
             smooth = 10;
 
-            CameraSettings = new CameraSettings(PreviewControl, Status, Dispatcher);
-            CameraSettings.ShowCameraListAsync();
+            Camera = new CoreCamera(PreviewControl);
+
             CamerasList.SelectedIndex = 0;
-            CameraSettings.cameraPreview.PreviewStatusChanged += CameraPreview_PreviewStatusChanged;
+            Camera.cameraPreview.PreviewStatusChanged += CameraPreview_PreviewStatusChanged;
 
-            MotionDataCollection = new MotionDataCollection();
-            ChartDiagnostic.DataContext = MotionDataCollection.MotionValue;
-
-            MotionDetector = new MotionDetector();
+            MotionDataCollection = new MotionDataCollection(20);
+            MotionChart.DataContext = MotionDataCollection.MotionValue;
 
             NetworkManager = new NetworkManager();
 
-            MotionDetectorFactory = new MotionDetectorFactory(CameraSettings, oldImg, NetworkManager,
-                MotionDetector, MotionDataCollection);
-
+            MotionDetectorFactory = new MotionDetectorFactory(Camera, MotionDataCollection);
             MotionDetectorFactory.ImageCaptured += MotionDetectorFactory_ImageCaptured;
 
-
-
             Task.Factory.StartNew(() => NetworkManager.Start());
-            //NetworkManager.Start();
-
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
-
         }
 
         private void MotionDetectorFactory_ImageCaptured(object sender, MotionResult e)
@@ -114,9 +105,9 @@ namespace MotionDetectionSurvilance
                 Status.Text = "No camera selected/found";
                 return;
             }
-            CameraSettings.settings.VideoDeviceId = selectedCamera.deviceInformation.Id;
+            Camera.settings.VideoDeviceId = selectedCamera.deviceInformation.Id;
 
-            CameraSettings.StartPreview();
+            Camera.StartPreview();
         }
 
         private void BtnCapture_Click(object sender, RoutedEventArgs e)
@@ -158,6 +149,13 @@ namespace MotionDetectionSurvilance
         public static async Task runOnUIThread(DispatchedHandler d)
         {
             await myDispatcher.RunAsync(CoreDispatcherPriority.Normal, d);
+        }
+
+        private static TextBlock myStatus;
+
+        public static async void ShowMessage(String message)
+        {
+            await runOnUIThread(() => myStatus.Text = message);
         }
     }
 }

@@ -128,11 +128,11 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="CameraInformation.cs" />
-    <Compile Include="CameraSettings.cs" />
+    <Compile Include="CameraPreview.cs" />
+    <Compile Include="CoreCamera.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MotionCamera.cs" />
     <Compile Include="MotionData.cs" />
     <Compile Include="MotionDetector.cs" />
     <Compile Include="MotionDetectorFactory.cs" />

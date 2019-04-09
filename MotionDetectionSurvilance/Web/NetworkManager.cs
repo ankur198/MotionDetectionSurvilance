@@ -16,18 +16,19 @@ namespace MotionDetectionSurvilance.Web
 {
     public class NetworkManager
     {
-        internal SoftwareBitmap Image;
         const string PORT = "8081";
 
         private const uint BufferSize = 8192;
 
         public event EventHandler<Settings> UpdateSettings;
 
+        private StreamSocketListener listener;
+
         public async void Start()
         {
             try
             {
-                var listener = new StreamSocketListener();
+                listener = new StreamSocketListener();
 
                 //listener.ConnectionReceived += async (sender, args) => { await OnConnection(sender, args); };
                 listener.Control.QualityOfService = SocketQualityOfService.LowLatency;
@@ -71,7 +72,7 @@ namespace MotionDetectionSurvilance.Web
                 {
                     var html = Encoding.UTF8.GetBytes(
                     $"<html><head><title>Background Message</title></head><body>Hello from motion!<br/>{query}<br/>" +
-                    $"{(Image != null ? SendImage() : "")}</body></html>");
+                    $"{(MainPage.oldImg != null ? SendImage() : "")}</body></html>");
                     using (var bodyStream = new MemoryStream(html))
                     {
                         var header = $"HTTP/1.1 200 OK\r\nContent-Length: {bodyStream.Length}\r\nConnection: close\r\n\r\n";
@@ -89,12 +90,12 @@ namespace MotionDetectionSurvilance.Web
 
         private string SendImage()
         {
-            if (Image == null)
+            if (MainPage.oldImg == null)
             {
                 return "";
             }
-            byte[] buffer = new Byte[4 * Image.PixelHeight * Image.PixelWidth];
-            Image.CopyToBuffer(buffer.AsBuffer());
+            byte[] buffer = new Byte[4 * MainPage.oldImg.PixelHeight * MainPage.oldImg.PixelWidth];
+            MainPage.oldImg.CopyToBuffer(buffer.AsBuffer());
 
             var x = Convert.ToBase64String(buffer);
 

@@ -9,47 +9,36 @@ namespace MotionDetectionSurvilance
 {
     internal class MotionDetectorFactory
     {
-        private readonly CameraSettings CameraSettings;
-        private SoftwareBitmap oldImg;
-        private readonly NetworkManager NetworkManager;
+        private readonly CoreCamera Camera;
         private readonly MotionDetector MotionDetector;
         private readonly MotionDataCollection MotionDataCollection;
 
-        public MotionDetectorFactory(CameraSettings cameraSettings, SoftwareBitmap oldImg,
-            NetworkManager networkManager, MotionDetector motionDetector,
+        public MotionDetectorFactory(CoreCamera cameraSettings,
             MotionDataCollection motionDataCollection)
         {
-            CameraSettings = cameraSettings;
-            this.oldImg = oldImg;
-            NetworkManager = networkManager;
-            MotionDetector = motionDetector;
+            Camera = cameraSettings;
+            MotionDetector = new MotionDetector();
             MotionDataCollection = motionDataCollection;
         }
 
         internal async void CaptureImage(int threshold, int smooth)
         {
             //capture new image
-            SoftwareBitmap newImage = await CameraSettings.cameraPreview.CaptureImage();
+            SoftwareBitmap newImage = await Camera.cameraPreview.CaptureImage();
 
             if (newImage != null)
             {
-                if (oldImg == null)
+                if (MainPage.oldImg == null)
                 {
-                    oldImg = newImage;
+                    MainPage.oldImg = newImage;
                 }
 
-                var result = await Task.Factory.StartNew(() => MotionDetector.ComputeDifference(oldImg, newImage, threshold, smooth));
+                var result = await Task.Factory.StartNew(() => MotionDetector.ComputeDifference(MainPage.oldImg, newImage, threshold, smooth));
 
-                //Status.Text = result.Difference.ToString();
                 await MainPage.runOnUIThread(() =>
                 MotionDataCollection.AddMotion(result.Difference));
-                NetworkManager.Image = result.Image;
 
-                oldImg = newImage; //update old image
-
-                //var source = new SoftwareBitmapSource();
-                //await source.SetBitmapAsync(result.Image);
-                //ImgPreview.Source = source;
+                MainPage.oldImg = newImage;
 
                 ImageCaptured?.Invoke(this, result);
             }

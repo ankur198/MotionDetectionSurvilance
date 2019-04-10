@@ -1,8 +1,11 @@
 ﻿using MotionDetectionSurvilance.Web;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
+using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -52,7 +55,7 @@ namespace MotionDetectionSurvilance
         private void MotionDetectorFactory_ImageCaptured(object sender, MotionResult e)
         {
             UpdatePrevToResult(e.Image);
-
+            ShowMessage(e.Difference.ToString());
             CaptureImage();
         }
 
@@ -156,6 +159,30 @@ namespace MotionDetectionSurvilance
         public static async void ShowMessage(String message)
         {
             await runOnUIThread(() => myStatus.Text = message);
+        }
+
+        private async void BtnReset_Click(object sender, RoutedEventArgs e)
+        {
+            const string key = "subscription.txt";
+            Windows.Storage.StorageFolder localSettings = Windows.Storage.ApplicationData.Current.LocalFolder;
+
+            string rawData;
+
+            try
+            {
+                rawData = await FileIO.ReadTextAsync(await localSettings.GetFileAsync(key));
+            }
+            catch (Exception)
+            {
+                return;
+            }
+            var listSubs = JsonConvert.DeserializeObject<List<SubscribeNotificationData>>(rawData);
+
+            var tf = new TaskFactory();
+            foreach (var item in listSubs)
+            {
+                await tf.StartNew(() => item.SendNotification());
+            }
         }
     }
 }

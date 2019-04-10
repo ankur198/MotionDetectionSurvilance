@@ -1,0 +1,25 @@
+section {
+  display: -ms-grid;
+  display: grid;
+  margin: 20px;
+  -ms-grid-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
+      grid-template-areas: 'controls image';
+}
+
+.controls {
+  grid-area: 'controls';
+}
+
+.controls * {
+  margin: 15px;
+}
+
+.image {
+  grid-area: 'image';
+}
+
+.mdl-slider__container * {
+  margin: 0;
+}
+/*# sourceMappingURL=style.css.map */

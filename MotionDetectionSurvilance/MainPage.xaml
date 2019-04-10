@@ -23,7 +23,12 @@
             </Grid.RowDefinitions>
 
             <StackPanel Orientation="Vertical">
-                <Button Name="StartPreview" Content="Start Preview" HorizontalAlignment="Center" Click="StartPreview_ClickAsync" Margin="10"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                    <Button Name="StartPreview" Content="Start Preview"  Click="StartPreview_ClickAsync" Margin="5"/>
+                    <Button Name="BtnCapture" Content="Capture" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
+                </StackPanel>
+                <Button Name="BtnReset" Content="Reset" HorizontalAlignment="Center" Margin="10" Click="BtnReset_Click"/>
+
                 <ListView Name="CamerasList" ItemsSource="{x:Bind Camera.Cameras}">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="local:CameraInformation">
@@ -32,7 +37,7 @@
                     </ListView.ItemTemplate>
                 </ListView>
 
-                <Button Name="BtnCapture" Content="Capture" HorizontalAlignment="Center" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
+                <Slider Name="Notification" Minimum="100" Maximum="1000" Margin="10" Header="Notifiaction At" StepFrequency="10"/>
 
                 <Slider Name="Noise" Minimum="0" Maximum="200" Value="{x:Bind threshold,Mode=TwoWay}" Margin="10" Header="De-noise" StepFrequency="5" />
 

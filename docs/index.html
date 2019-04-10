@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Motion Detection Surveillance</title>
+
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.indigo-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+  <link rel="stylesheet" href="styles/index.css">
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+
+<body>
+
+  <header>
+    <h1>Motion Detection Surveillance</h1>
+  </header>
+
+  <main>
+    <p>
+      <button disabled class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+        Enable Notification
+      </button>
+    </p>
+    <section class="subscription-details js-subscription-details is-invisible">
+      <p></p>
+      <pre><code class="js-subscription-json"></code></pre>
+    </section>
+  </main>
+
+  <section class="myContent">
+    <div class="controls">
+      <form onsubmit="return false">
+        <div>
+          <label for="Noise">Noise</label>
+          <input type="range" name="Noise" min="0" max="200" id="Noise" onchange="sendData('/?Noise='+value)"
+            class="mdl-slider mdl-js-slider">
+        </div>
+        <div>
+          <label for="Multiplier">Multiplier</label>
+          <input type="range" name="Multiplier" min="100" max="5000" id="Multiplier"
+            onchange="sendData('/?Multiplier='+value)" class="mdl-slider mdl-js-slider">
+        </div>
+      </form>
+    <div id="buttons">
+      <input type="button" value="Start Image" onclick="startPrev()"
+        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+      <input type="button" value="Stop Image" onclick="stopPrev()"
+        class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
+      <div>
+        <label>Ip</label>
+        <input type="text" id="ip" onchange="url=value" value="http://192.168.1.104:8081" class="mdl-textfield__input">
+      </div>
+      <p id="status">Preview Stopped</p>
+    </div>
+    </div>
+    <div class="image"><img src="" id="img" alt=""></div>
+  </section>
+  <script>
+    let url = "http://192.168.1.104:8081";
+    var preview = false;
+
+    const sleep = (ms) => {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function sendReq() {
+      let req = new XMLHttpRequest();
+      req.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
+          document.getElementById('img').setAttribute('src',
+            'data:image/png;base64,' + this.responseText);
+          if (preview) {
+            //setTimeout(sendReq(), 20000);
+            sleep(500).then(() => sendReq());
+          }
+        }
+      }
+      req.open("GET", url + '/image', true);
+      req.send();
+    }
+
+    function startPrev() {
+      console.log("yo")
+      document.querySelector('#status').innerText = "Preview Started"
+      preview = true;
+      sendReq();
+    }
+
+    function stopPrev() {
+      document.querySelector('#status').innerText = "Preview Stopped"
+      preview = false;
+    }
+
+    function sendData(val) {
+      let turl = url + val
+      let req = new XMLHttpRequest();
+      req.open("GET", turl, true);
+      req.send();
+    }
+
+    function setIpFromParam() {
+      let params = (new URL(document.location)).searchParams;
+      url = 'http://' + params.get('ip');
+      document.querySelector("#ip").value = url;
+    }
+
+    setIpFromParam();
+  </script>
+
+  <script src="scripts/main.js"></script>
+
+  <script src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+</body>
+
+</html>

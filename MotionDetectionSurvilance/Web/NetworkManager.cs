@@ -1,16 +1,15 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
-using Windows.Networking.Connectivity;
 using Windows.Networking.Sockets;
+using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI.Core;
 
 namespace MotionDetectionSurvilance.Web
 {
@@ -63,23 +62,30 @@ namespace MotionDetectionSurvilance.Web
                 }
             }
 
-            string query = GetQuery(request);
+            Uri uri = GetQuery(request);
+
+            if (uri.LocalPath.ToLower() == "/sub")
+            {
+                subscribeNotification(uri);
+            }
+
+            string query = uri.Query;
             ProcessQuery(query);
 
             using (var output = args.Socket.OutputStream)
             {
                 using (var response = output.AsStreamForWrite())
                 {
-                    var html = Encoding.UTF8.GetBytes(
-                    $"<html><head><title>Background Message</title></head><body>Hello from motion!<br/>{query}<br/>" +
-                    $"{(MainPage.oldImg != null ? SendImage() : "")}</body></html>");
+
+                    var outputText = await SendOutput(uri.LocalPath);
+
+                    var html = Encoding.UTF8.GetBytes(outputText);
                     using (var bodyStream = new MemoryStream(html))
                     {
-                        var header = $"HTTP/1.1 200 OK\r\nContent-Length: {bodyStream.Length}\r\nConnection: close\r\n\r\n";
+                        var header = $"HTTP/1.1 200 OK\r\nContent-Length: {bodyStream.Length}\r\nAccess-Control-Allow-Origin:*\r\nConnection: close\r\n\r\n";
                         var headerArray = Encoding.UTF8.GetBytes(header);
                         await response.WriteAsync(headerArray,
                                                   0, headerArray.Length);
-
 
                         await bodyStream.CopyToAsync(response);
                         await response.FlushAsync();
@@ -88,19 +94,74 @@ namespace MotionDetectionSurvilance.Web
             }
         }
 
-        private string SendImage()
+        private async void subscribeNotification(Uri uri)
         {
-            if (MainPage.oldImg == null)
+            const string key = "subscription.txt";
+            StorageFolder localFolder = ApplicationData.Current.LocalFolder;
+
+            var formattedText = FormatQuery(uri.Query);
+
+            var data = new SubscribeNotificationData() { endpoint = formattedText["endpoint"], auth = formattedText["auth"], p256dh = formattedText["p256dh"] };
+            List<SubscribeNotificationData> list;
+            try
             {
+                string oldSubs = await FileIO.ReadTextAsync(await localFolder.GetFileAsync(key));
+                list = JsonConvert.DeserializeObject<List<SubscribeNotificationData>>(oldSubs);
+            }
+            catch (Exception)
+            {
+
+                list = new List<SubscribeNotificationData>();
+            }
+            list.Add(data);
+
+            var file = await localFolder.CreateFileAsync(key, CreationCollisionOption.ReplaceExisting);
+            await FileIO.WriteTextAsync(file, JsonConvert.SerializeObject(list));
+        }
+
+        private async Task<string> SendOutput(string localPath)
+        {
+            if (localPath.ToLower() == "/image")
+            {
+                return await SendImage();
+            }
+
+            return "bhoooooo";
+        }
+
+        private async Task<string> SendImage()
+        {
+            try
+            {
+                if (MainPage.oldImg == null)
+                {
+                    return "";
+                }
+
+                var stream = new InMemoryRandomAccessStream();
+
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
+
+                encoder.SetSoftwareBitmap(MainPage.oldImg);
+                await encoder.FlushAsync();
+
+                var ms = new MemoryStream();
+                stream.AsStream().CopyTo(ms);
+                var tdata = ms.ToArray();
+
+                var x = Convert.ToBase64String(tdata);
+
+                ms.Dispose();
+                stream.Dispose();
+                return x;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
                 return "";
             }
-            byte[] buffer = new Byte[4 * MainPage.oldImg.PixelHeight * MainPage.oldImg.PixelWidth];
-            MainPage.oldImg.CopyToBuffer(buffer.AsBuffer());
-
-            var x = Convert.ToBase64String(buffer);
-
-            return x;
         }
+
 
         private void ProcessQuery(string query)
         {
@@ -147,7 +208,7 @@ namespace MotionDetectionSurvilance.Web
             return formattedQueries;
         }
 
-        private static string GetQuery(StringBuilder request)
+        private static Uri GetQuery(StringBuilder request)
         {
             var requestLines = request.ToString().Split(' ');
 
@@ -155,8 +216,7 @@ namespace MotionDetectionSurvilance.Web
                               ? requestLines[1] : string.Empty;
 
             var uri = new Uri("http://localhost" + url);
-            var query = uri.Query;
-            return query;
+            return uri;
         }
     }
 }

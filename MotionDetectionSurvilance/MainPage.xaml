@@ -42,8 +42,8 @@
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <CheckBox Name="NotificationCheck" Content="Enable" Width="19" HorizontalAlignment="Center" Margin="10 0 0 0" />
-                    <Slider Grid.Column="1" Name="Notification" Minimum="100" Maximum="1000" Margin="10" Header="Notifiaction At" StepFrequency="5" Width="auto"/>
+                    <CheckBox Name="NotificationEnable" Content="Enable" Width="19" HorizontalAlignment="Center" Margin="10 0 0 0" />
+                    <Slider Grid.Column="1" Name="NotificationAt" Minimum="100" Maximum="1000" Margin="10" Header="Notifiaction At" StepFrequency="5" Width="auto"/>
                 </Grid>
 
                 <Slider Name="Noise" Minimum="0" Maximum="200" Value="{x:Bind threshold,Mode=TwoWay}" Margin="10" Header="De-noise" StepFrequency="5" />

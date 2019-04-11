@@ -13,6 +13,6 @@ namespace MotionDetectionSurvilance
     }
     public enum SettingName
     {
-        Noise, Multiplier
+        Noise, Multiplier,NotificationAt,NotificationEnable
     }
 }

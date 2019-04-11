@@ -63,7 +63,7 @@ namespace MotionDetectionSurvilance
         {
             int notification = 999999;
             bool? isNotification = false;
-            await runOnUIThread(() => { notification = (int)Notification.Value; isNotification = NotificationCheck.IsChecked; });
+            await runOnUIThread(() => { notification = (int)NotificationAt.Value; isNotification = NotificationEnable.IsChecked; });
             if (e.Difference > notification && isNotification == true)
             {
                 MotionDetectorFactory.SaveImage();
@@ -90,7 +90,7 @@ namespace MotionDetectionSurvilance
             {
                 int notification = 999999;
                 bool? isNotification = false;
-                await runOnUIThread(() => { notification = (int)Notification.Value; isNotification = NotificationCheck.IsChecked; });
+                await runOnUIThread(() => { notification = (int)NotificationAt.Value; isNotification = NotificationEnable.IsChecked; });
                 if (e.Difference > notification && isNotification == true)
                 {
                     //big movement occured
@@ -134,13 +134,20 @@ namespace MotionDetectionSurvilance
         {
             await runOnUIThread(() =>
             {
-                if (e.SettingName == SettingName.Noise)
+                switch (e.SettingName)
                 {
-                    Noise.Value = e.Value;
-                }
-                else if (e.SettingName == SettingName.Multiplier)
-                {
-                    Multiplier.Value = e.Value;
+                    case SettingName.Noise:
+                        Noise.Value = e.Value;
+                        break;
+                    case SettingName.Multiplier:
+                        Multiplier.Value = e.Value;
+                        break;
+                    case SettingName.NotificationAt:
+                        NotificationAt.Value = e.Value;
+                        break;
+                    case SettingName.NotificationEnable:
+                        NotificationEnable.IsChecked = e.Value == 0 ? false : true;
+                        break;
                 }
             });
         }

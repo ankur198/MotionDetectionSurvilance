@@ -24,6 +24,11 @@ section {
     }
 }
 
+.flex-row {
+    display: flex;
+    flex-direction: row;
+}
+
 .mdl-slider__container * {
     margin: 0;
 }

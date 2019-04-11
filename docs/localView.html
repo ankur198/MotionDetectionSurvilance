@@ -29,9 +29,28 @@
     </main>
     <section class='myContent'>
         <div class='controls'>
+
+
             <input type='button' value='Subscribe'
                 class='mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect' onclick='SubToGithub()'>
+
             <form onsubmit='return false'>
+
+                <div>
+                        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="notificationEnable">
+                                <input type="checkbox" id="notificationEnable" class="mdl-switch__input" onchange='let val = checked?1:0; sendData("/?NotificationEnable="+ val)'>
+                                <span class="mdl-switch__label">Enable</span>
+                            </label>
+                </div>
+
+                <div>
+                        <label for="NotificationAt">
+                                Notification At
+                                <input class="mdl-slider mdl-js-slider" type="range" id="NotificationAt" min="100" max="1000" value="100" onchange='sendData("/?NotificationAt="+value)'
+                                    tabindex="0">
+                            </label>
+                </div>
+
                 <div> <label for='Noise'>Noise</label> <input type='range' name='Noise' min='0' max='200' id='Noise'
                         onchange='sendData("/?Noise="+value)' class='mdl-slider mdl-js-slider'> </div>
                 <div> <label for='Multiplier'>Multiplier</label> <input type='range' name='Multiplier' min='100'

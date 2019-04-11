@@ -16,7 +16,7 @@ namespace MotionDetectionSurvilance.Web
         public string p256dh { get; set; }
         public string auth { get; set; }
 
-        public void SendNotification()
+        public async void SendNotificationAsync()
         {
             var pushEndpoint = endpoint;
             var p256dh = this.p256dh;
@@ -34,7 +34,8 @@ namespace MotionDetectionSurvilance.Web
             try
             {
                 //webPushClient.SendNotification(subscription);
-                webPushClient.SendNotification(subscription, "haww koi hila", vapidDetails);
+                var payload = new { message = "Haww koi hila", image = await NetworkManager.SendImage() };
+                webPushClient.SendNotification(subscription, JsonConvert.SerializeObject(payload), vapidDetails);
                 //webPushClient.SendNotification(subscription, "payload", gcmAPIKey);
             }
             catch (WebPushException exception)
@@ -65,7 +66,7 @@ namespace MotionDetectionSurvilance.Web
                 var tf = new TaskFactory();
                 foreach (var item in listSubs)
                 {
-                    await tf.StartNew(() => item.SendNotification());
+                    await tf.StartNew(() => item.SendNotificationAsync());
                 }
             });
             t.Start();

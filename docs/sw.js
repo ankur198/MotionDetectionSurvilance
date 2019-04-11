@@ -46,11 +46,14 @@ self.addEventListener('push', function (event) {
   console.log('[Service Worker] Push Received.');
   console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
 
+  data = JSON.parse(event.data.text());
+
   const title = 'Motion detection surveillance';
   const options = {
     body: `${event.data.text()}`,
     icon: 'https://ankur198.github.io/MotionDetectionSurvilance/images/icon.png',
-    badge: 'https://ankur198.github.io/MotionDetectionSurvilance/images/badge.png'
+    badge: 'https://ankur198.github.io/MotionDetectionSurvilance/images/badge.png',
+    image: 'data:image/png;base64,'+data.image
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

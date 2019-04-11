@@ -67,7 +67,8 @@ function sendSubscriptionToServer(subscription) {
 
   console.log(path);
 
-  window.location.replace(path);
+  if (prompt("Go back to controls?"))
+    window.location.replace(path);
 }
 
 

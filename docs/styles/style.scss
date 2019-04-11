@@ -9,6 +9,7 @@ section {
 
 .controls {
     grid-area: 'controls';
+
     * {
         margin: 15px;
     }
@@ -16,15 +17,22 @@ section {
 
 .image {
     grid-area: 'image';
+    width: 100%;
+
+    img {
+        width: 100%;
+    }
 }
-.mdl-slider__container *{
+
+.mdl-slider__container * {
     margin: 0;
 }
 
-@media only screen and (max-width:750px)
-{
-    section{
+@media only screen and (max-width: 1000px) {
+    section {
         grid-template-columns: 1fr;
-
+        grid-template-areas:
+            'controls'
+            'image';
     }
 }

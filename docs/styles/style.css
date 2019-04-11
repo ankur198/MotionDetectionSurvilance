@@ -17,16 +17,22 @@ section {
 
 .image {
   grid-area: 'image';
+  width: 100%;
+}
+
+.image img {
+  width: 100%;
 }
 
 .mdl-slider__container * {
   margin: 0;
 }
 
-@media only screen and (max-width: 750px) {
+@media only screen and (max-width: 1000px) {
   section {
     -ms-grid-columns: 1fr;
         grid-template-columns: 1fr;
+        grid-template-areas: 'controls' 'image';
   }
 }
 /*# sourceMappingURL=style.css.map */

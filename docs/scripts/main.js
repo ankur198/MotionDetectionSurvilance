@@ -63,11 +63,11 @@ function updateBtn() {
 function sendSubscriptionToServer(subscription) {
   let sub = JSON.parse(JSON.stringify(subscription));
 
-  let req = new XMLHttpRequest();
   let path = url + '/sub' + `?endpoint=${sub.endpoint}&p256dh=${sub.keys.p256dh}&auth=${sub.keys.auth}`;
 
-  req.open("GET", path);
-  req.send();
+  console.log(path);
+
+  window.location.replace(path);
 }
 
 
@@ -157,7 +157,7 @@ function initializeUI() {
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log('Service Worker and Push is supported');
 
-  navigator.serviceWorker.register('https://ankur198.github.io/MotionDetectionSurvilance/sw.js')
+  navigator.serviceWorker.register('sw.js')
     .then(function (swReg) {
       console.log('Service Worker is registered', swReg);
 
@@ -230,4 +230,6 @@ function setIpFromHost() {
   document.querySelector("#ip").value = url;
 }
 
-setIpFromHost();
+function SubToGithub() {
+  window.location.replace("https://ankur198.github.io/MotionDetectionSurvilance/?ip=" + url);
+}

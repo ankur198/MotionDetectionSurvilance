@@ -4,8 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Graphics.Imaging;
+using Windows.Media.MediaProperties;
 using Windows.Storage;
+using Windows.Storage.FileProperties;
+using Windows.Storage.Streams;
+using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -46,17 +51,64 @@ namespace MotionDetectionSurvilance
             NetworkManager = new NetworkManager();
 
             MotionDetectorFactory = new MotionDetectorFactory(Camera, MotionDataCollection);
-            MotionDetectorFactory.ImageCaptured += MotionDetectorFactory_ImageCaptured;
+            MotionDetectorFactory.ImageCaptured += UpdateUI;
+            MotionDetectorFactory.ImageCaptured += SendNotification;
+            MotionDetectorFactory.ImageCaptured += SaveImage;
 
             Task.Factory.StartNew(() => NetworkManager.Start());
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
         }
 
-        private void MotionDetectorFactory_ImageCaptured(object sender, MotionResult e)
+        private async void SaveImage(object sender, MotionResult e)
+        {
+            int notification = 999999;
+            bool? isNotification = false;
+            await runOnUIThread(() => { notification = (int)Notification.Value; isNotification = NotificationCheck.IsChecked; });
+            if (e.Difference > notification && isNotification == true)
+            {
+                MotionDetectorFactory.SaveImage();
+                Debug.WriteLine("Image Captured");
+            }
+
+            await runOnUIThread(() =>
+            {
+                if (e.Difference > notification)
+                {
+                    NotificationControl.Background = new SolidColorBrush(Color.FromArgb(255, 244, 217, 66));
+                }
+                else
+                {
+                    NotificationControl.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+                }
+            });
+        }
+
+
+        private void SendNotification(object sender, MotionResult e)
+        {
+            new Task(async () =>
+            {
+                int notification = 999999;
+                bool? isNotification = false;
+                await runOnUIThread(() => { notification = (int)Notification.Value; isNotification = NotificationCheck.IsChecked; });
+                if (e.Difference > notification && isNotification == true)
+                {
+                    //big movement occured
+                    SubscribeNotificationData.sendNotificationToAll();
+                    MotionDetectorFactory.ImageCaptured -= SendNotification;
+                    Task.Delay(5000).Wait();
+                    MotionDetectorFactory.ImageCaptured += SendNotification;
+                }
+            }).Start();
+        }
+
+        private void UpdateUI(object sender, MotionResult e)
         {
             UpdatePrevToResult(e.Image);
             ShowMessage(e.Difference.ToString());
             CaptureImage();
+
+
         }
 
         private async void UpdatePrevToResult(SoftwareBitmap image)
@@ -163,26 +215,7 @@ namespace MotionDetectionSurvilance
 
         private async void BtnReset_Click(object sender, RoutedEventArgs e)
         {
-            const string key = "subscription.txt";
-            Windows.Storage.StorageFolder localSettings = Windows.Storage.ApplicationData.Current.LocalFolder;
-
-            string rawData;
-
-            try
-            {
-                rawData = await FileIO.ReadTextAsync(await localSettings.GetFileAsync(key));
-            }
-            catch (Exception)
-            {
-                return;
-            }
-            var listSubs = JsonConvert.DeserializeObject<List<SubscribeNotificationData>>(rawData);
-
-            var tf = new TaskFactory();
-            foreach (var item in listSubs)
-            {
-                await tf.StartNew(() => item.SendNotification());
-            }
+            await ApplicationData.Current.ClearAsync();
         }
     }
 }

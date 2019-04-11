@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.Graphics.Imaging;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
+using Windows.Storage;
+using Windows.Storage.FileProperties;
+using Windows.Storage.Streams;
 using Windows.System.Display;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
@@ -30,6 +35,41 @@ namespace MotionDetectionSurvilance
         public CameraPreview(CaptureElement previewControl)
         {
             this.previewControl = previewControl;
+        }
+
+        internal async void SaveImage()
+        {
+            try
+            {
+                var myPictures = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Pictures);
+                var motionPictures = await myPictures.SaveFolder.CreateFolderAsync("MotionPictures", CreationCollisionOption.OpenIfExists);
+                StorageFile file = await motionPictures.CreateFileAsync("motionPhoto.jpg", CreationCollisionOption.GenerateUniqueName);
+
+                var stream = new InMemoryRandomAccessStream();
+
+                BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.JpegEncoderId, stream);
+
+                encoder.SetSoftwareBitmap(MainPage.oldImg);
+                await encoder.FlushAsync();
+
+                using (var fileStream = await file.OpenAsync(FileAccessMode.ReadWrite))
+                {
+                    var decoder = await BitmapDecoder.CreateAsync(stream);
+                    var encoder1 = await BitmapEncoder.CreateForTranscodingAsync(fileStream, decoder);
+
+                    var properties = new BitmapPropertySet { { "System.Photo.Orientation", new BitmapTypedValue(PhotoOrientation.Normal, PropertyType.UInt16) } };
+                    await encoder1.BitmapProperties.SetPropertiesAsync(properties);
+
+                    await encoder1.FlushAsync();
+                }
+
+                //ms.Dispose();
+                stream.Dispose();
+            }
+            catch (Exception e)
+            {
+                //throw;
+            }
         }
 
         internal async Task<SoftwareBitmap> CaptureImage()

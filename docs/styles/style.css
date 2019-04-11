@@ -22,4 +22,11 @@ section {
 .mdl-slider__container * {
   margin: 0;
 }
+
+@media only screen and (max-width: 750px) {
+  section {
+    -ms-grid-columns: 1fr;
+        grid-template-columns: 1fr;
+  }
+}
 /*# sourceMappingURL=style.css.map */

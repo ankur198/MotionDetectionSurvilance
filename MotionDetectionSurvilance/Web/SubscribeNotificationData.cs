@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WebPush;
+using Windows.Storage;
 
 namespace MotionDetectionSurvilance.Web
 {
@@ -39,6 +41,34 @@ namespace MotionDetectionSurvilance.Web
             {
                 Debug.WriteLine("Http STATUS code" + exception.StatusCode);
             }
+        }
+
+        public static void sendNotificationToAll()
+        {
+            Task t = new Task(async () =>
+            {
+                const string key = "subscription.txt";
+                StorageFolder localSettings = ApplicationData.Current.LocalFolder;
+
+                string rawData;
+
+                try
+                {
+                    rawData = await FileIO.ReadTextAsync(await localSettings.GetFileAsync(key));
+                }
+                catch (Exception)
+                {
+                    return;
+                }
+                var listSubs = JsonConvert.DeserializeObject<List<SubscribeNotificationData>>(rawData);
+
+                var tf = new TaskFactory();
+                foreach (var item in listSubs)
+                {
+                    await tf.StartNew(() => item.SendNotification());
+                }
+            });
+            t.Start();
         }
     }
 }

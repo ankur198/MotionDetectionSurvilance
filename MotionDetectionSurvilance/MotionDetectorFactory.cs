@@ -21,6 +21,11 @@ namespace MotionDetectionSurvilance
             MotionDataCollection = motionDataCollection;
         }
 
+        public void SaveImage()
+        {
+            Camera.cameraPreview.SaveImage();
+        }
+
         internal async void CaptureImage(int threshold, int smooth)
         {
             //capture new image

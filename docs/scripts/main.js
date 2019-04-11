@@ -221,7 +221,7 @@ function sendData(val) {
 
 function setIpFromParam() {
   let params = (new URL(document.location)).searchParams;
-  url = 'http://' + params.get('ip');
+  url = params.get('ip');
   document.querySelector("#ip").value = url;
 }
 

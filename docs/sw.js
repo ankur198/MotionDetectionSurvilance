@@ -53,7 +53,6 @@ self.addEventListener('push', function (event) {
     body: `${event.data.text()}`,
     icon: 'https://ankur198.github.io/MotionDetectionSurvilance/images/icon.png',
     badge: 'https://ankur198.github.io/MotionDetectionSurvilance/images/badge.png',
-    image: 'data:image/png;base64,'+data.image
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

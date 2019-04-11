@@ -34,8 +34,8 @@ namespace MotionDetectionSurvilance.Web
             try
             {
                 //webPushClient.SendNotification(subscription);
-                var payload = new { message = "Haww koi hila", image = await NetworkManager.SendImage() };
-                webPushClient.SendNotification(subscription, JsonConvert.SerializeObject(payload), vapidDetails);
+                //var payload = new { message = "Haww koi hila", image = await NetworkManager.SendImage() };
+                webPushClient.SendNotification(subscription," koi hila", vapidDetails);
                 //webPushClient.SendNotification(subscription, "payload", gcmAPIKey);
             }
             catch (WebPushException exception)

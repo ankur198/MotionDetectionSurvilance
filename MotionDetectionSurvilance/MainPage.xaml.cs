@@ -154,12 +154,12 @@ namespace MotionDetectionSurvilance
 
         private void CameraPreview_PreviewStatusChanged(object sender, bool preview)
         {
-            StartPreview.Content = $"{(preview ? "Stop" : "Start")} preview";
-            CamerasList.IsEnabled = !preview;
+            //StartPreview.Content = $"{(preview ? "Stop" : "Start")} preview";
+            //CamerasList.IsEnabled = !preview;
             BtnCapture.IsEnabled = preview;
         }
 
-        private void StartPreview_ClickAsync(object sender, RoutedEventArgs e)
+        private void CamerasList_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
             var selectedCamera = CamerasList.SelectedItem as CameraInformation;
             if (selectedCamera == null)
@@ -225,9 +225,6 @@ namespace MotionDetectionSurvilance
             await ApplicationData.Current.ClearAsync();
         }
 
-        private void CamerasList_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
-        {
-            
-        }
+        
     }
 }

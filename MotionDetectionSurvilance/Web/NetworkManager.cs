@@ -35,7 +35,7 @@ namespace MotionDetectionSurvilance.Web
 
                 await listener.BindServiceNameAsync(PORT);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
                 throw;

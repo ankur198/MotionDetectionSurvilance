@@ -66,7 +66,7 @@ namespace MotionDetectionSurvilance
                 //ms.Dispose();
                 stream.Dispose();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 //throw;
             }

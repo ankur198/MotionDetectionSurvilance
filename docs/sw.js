@@ -49,8 +49,8 @@ self.addEventListener('push', function (event) {
   const title = 'Motion detection surveillance';
   const options = {
     body: `${event.data.text()}`,
-    icon: 'images/icon.png',
-    badge: 'images/badge.png'
+    icon: 'https://ankur198.github.io/MotionDetectionSurvilance/images/icon.png',
+    badge: 'https://ankur198.github.io/MotionDetectionSurvilance/images/badge.png'
   };
 
   event.waitUntil(self.registration.showNotification(title, options));

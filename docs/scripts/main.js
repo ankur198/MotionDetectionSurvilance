@@ -157,7 +157,7 @@ function initializeUI() {
 if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.log('Service Worker and Push is supported');
 
-  navigator.serviceWorker.register('sw.js')
+  navigator.serviceWorker.register('https://ankur198.github.io/MotionDetectionSurvilance/sw.js')
     .then(function (swReg) {
       console.log('Service Worker is registered', swReg);
 
@@ -171,3 +171,57 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
   console.warn('Push messaging is not supported');
   pushButton.textContent = 'Push Not Supported';
 }
+
+
+
+
+
+let url = "http://192.168.1.104:8081";
+var preview = false;
+
+const sleep = (ms) => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function sendReq() {
+  let req = new XMLHttpRequest();
+  req.onreadystatechange = function () {
+    if (this.readyState == 4 && this.status == 200) {
+      document.getElementById('img').setAttribute('src',
+        'data:image/png;base64,' + this.responseText);
+      if (preview) {
+        //setTimeout(sendReq(), 20000);
+        sleep(500).then(() => sendReq());
+      }
+    }
+  }
+  req.open("GET", url + '/image', true);
+  req.send();
+}
+
+function startPrev() {
+  console.log("yo")
+  document.querySelector('#status').innerText = "Preview Started"
+  preview = true;
+  sendReq();
+}
+
+function stopPrev() {
+  document.querySelector('#status').innerText = "Preview Stopped"
+  preview = false;
+}
+
+function sendData(val) {
+  let turl = url + val
+  let req = new XMLHttpRequest();
+  req.open("GET", turl, true);
+  req.send();
+}
+
+function setIpFromParam() {
+  let params = (new URL(document.location)).searchParams;
+  url = 'http://' + params.get('ip');
+  document.querySelector("#ip").value = url;
+}
+
+setIpFromParam();

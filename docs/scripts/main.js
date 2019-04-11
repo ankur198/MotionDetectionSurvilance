@@ -224,4 +224,10 @@ function setIpFromParam() {
   document.querySelector("#ip").value = url;
 }
 
-setIpFromParam();
+function setIpFromHost() {
+  let params = (new URL(document.location)).searchParams;
+  url = 'http://' + window.location.host;
+  document.querySelector("#ip").value = url;
+}
+
+setIpFromHost();

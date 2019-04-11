@@ -224,5 +224,10 @@ namespace MotionDetectionSurvilance
         {
             await ApplicationData.Current.ClearAsync();
         }
+
+        private void CamerasList_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        {
+            
+        }
     }
 }

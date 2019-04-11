@@ -37,17 +37,17 @@
             <form onsubmit='return false'>
 
                 <div>
-                        <label class="mdl-switch mdl-js-switch mdl-js-ripple-effect" for="notificationEnable">
-                                <input type="checkbox" id="notificationEnable" class="mdl-switch__input" onchange='let val = checked?1:0; sendData("/?NotificationEnable="+ val)'>
-                                <span class="mdl-switch__label">Enable</span>
+                        <label class='mdl-switch mdl-js-switch mdl-js-ripple-effect' for='notificationEnable'>
+                                <input type='checkbox' id='notificationEnable' class='mdl-switch__input' onchange='let val = checked?1:0; sendData("/?NotificationEnable="+ val)'>
+                                <span class='mdl-switch__label'>Enable</span>
                             </label>
                 </div>
 
                 <div>
-                        <label for="NotificationAt">
+                        <label for='NotificationAt'>
                                 Notification At
-                                <input class="mdl-slider mdl-js-slider" type="range" id="NotificationAt" min="100" max="1000" value="100" onchange='sendData("/?NotificationAt="+value)'
-                                    tabindex="0">
+                                <input class='mdl-slider mdl-js-slider' type='range' id='NotificationAt' min='100' max='1000' value='100' onchange='sendData("/?NotificationAt="+value)'
+                                    tabindex='0'>
                             </label>
                 </div>
 

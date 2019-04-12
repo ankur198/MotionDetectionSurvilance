@@ -46,8 +46,6 @@ self.addEventListener('push', function (event) {
   console.log('[Service Worker] Push Received.');
   console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
 
-  data = JSON.parse(event.data.text());
-
   const title = 'Motion detection surveillance';
   const options = {
     body: `${event.data.text()}`,

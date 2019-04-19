@@ -2,9 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using Windows.Graphics.Imaging;
+using Windows.Networking.Connectivity;
 using Windows.Storage;
 using Windows.UI;
 using Windows.UI.Core;
@@ -60,10 +62,12 @@ namespace MotionDetectionSurvilance
 
             EmailCredentials = EmailCredentials.GetValues() ?? new EmailCredentials();
             textBoxEmail.Text = EmailCredentials.FromEmail;
-            textBoxPassword.Text = EmailCredentials.Password;
+            textBoxPassword.Password = EmailCredentials.Password;
 
             subEmail = new TextBox[] { subEmail1, subEmail2, subEmail3, subEmail4 };
             ShowSubEmail();
+
+            ShowMessage($"Web portal at: {GetLocalIp()}:8081");
         }
 
         private void ShowSubEmail()
@@ -248,7 +252,7 @@ namespace MotionDetectionSurvilance
                 btnCredentials.Flyout.Hide();
             });
             EmailCredentials.FromEmail = textBoxEmail.Text;
-            EmailCredentials.Password = textBoxPassword.Text;
+            EmailCredentials.Password = textBoxPassword.Password;
 
             var x = new List<EmailData>();
 
@@ -279,6 +283,22 @@ namespace MotionDetectionSurvilance
                     throw;
                 }
             }
+        }
+
+        private string GetLocalIp()
+        {
+            var icp = NetworkInformation.GetInternetConnectionProfile();
+
+            if (icp?.NetworkAdapter == null) return null;
+            var hostname =
+                NetworkInformation.GetHostNames()
+                    .SingleOrDefault(
+                        hn =>
+                            hn.IPInformation?.NetworkAdapter != null && hn.IPInformation.NetworkAdapter.NetworkAdapterId
+                            == icp.NetworkAdapter.NetworkAdapterId);
+
+            // the ip address
+            return hostname?.CanonicalName;
         }
     }
 }

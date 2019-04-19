@@ -57,6 +57,14 @@ namespace MotionDetectionSurvilance
 
             Task.Factory.StartNew(() => NetworkManager.Start());
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
+
+            CreateFakeEmails();
+        }
+
+        private void CreateFakeEmails()
+        {
+            EmailData.EmailList = new List<EmailData>();
+            EmailData.EmailList.Add(new EmailData("ankur.nigam198@live.com"));
         }
 
         private async void SaveImage(object sender, MotionResult e)
@@ -95,6 +103,7 @@ namespace MotionDetectionSurvilance
                 {
                     //big movement occured
                     SubscribeNotificationData.sendNotificationToAll();
+                    EmailData.SendEmailToAll();
                     MotionDetectorFactory.ImageCaptured -= SendNotification;
                     Task.Delay(5000).Wait();
                     MotionDetectorFactory.ImageCaptured += SendNotification;
@@ -225,6 +234,6 @@ namespace MotionDetectionSurvilance
             await ApplicationData.Current.ClearAsync();
         }
 
-        
+
     }
 }

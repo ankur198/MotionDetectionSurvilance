@@ -140,6 +140,7 @@
     <Compile Include="MotionDetectorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="Web\EmailData.cs" />
     <Compile Include="Web\MyWebServer.cs" />
     <Compile Include="Web\NetworkManager.cs" />
     <Compile Include="Web\SubscribeNotificationData.cs" />
@@ -174,6 +175,9 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.8</Version>
     </PackageReference>
+    <PackageReference Include="Sendgrid">
+      <Version>9.11.0</Version>
+    </PackageReference>
     <PackageReference Include="Telerik.UI.for.UniversalWindowsPlatform">
       <Version>1.0.1.4</Version>
     </PackageReference>
@@ -181,7 +185,9 @@
       <Version>1.0.11</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

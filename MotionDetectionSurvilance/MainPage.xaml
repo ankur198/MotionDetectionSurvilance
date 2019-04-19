@@ -24,6 +24,7 @@
 
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+                    <HyperlinkButton Content="Set Credentials" HorizontalAlignment="Center" Click="HyperlinkButton_Click"/>
                     <Button Name="BtnCapture" Content="Start Monitoring" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
                     <Button Name="BtnReset" Content="Reset Notification Sub" HorizontalAlignment="Center" Margin="10" Click="BtnReset_Click"/>
                 </StackPanel>

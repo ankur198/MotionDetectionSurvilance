@@ -234,6 +234,9 @@ namespace MotionDetectionSurvilance
             await ApplicationData.Current.ClearAsync();
         }
 
-
+        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.Frame.Navigate(typeof(EmailCredentials));
+        }
     }
 }

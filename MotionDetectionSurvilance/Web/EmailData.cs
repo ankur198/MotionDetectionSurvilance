@@ -1,6 +1,4 @@
-﻿using SendGrid;
-using SendGrid.Helpers.Mail;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,15 +34,15 @@ namespace MotionDetectionSurvilance.Web
 
             var html = $"<html><body><h1>Found Some movement</h1><br><img src='data:image/png;base64, {image}'/></body></html>";
 
-            var apiKey = "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";
-            var client = new SendGridClient(apiKey);
+            //var apiKey = "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";
+            //var client = new SendGridClient(apiKey);
 
-            var from = new EmailAddress("ankur.nigam198@gmail.com", "Ankur Nigam");
-            var subject = "Motion found!!";
-            var to = new EmailAddress(this.EmailTo);
-            var msg = MailHelper.CreateSingleEmail(from, to, subject, "", html);
+            //var from = new EmailAddress("ankur.nigam198@gmail.com", "Ankur Nigam");
+            //var subject = "Motion found!!";
+            //var to = new EmailAddress(this.EmailTo);
+            //var msg = MailHelper.CreateSingleEmail(from, to, subject, "", html);
 
-            var res = await client.SendEmailAsync(msg);
+            //var res = await client.SendEmailAsync(msg);
 
         }
     }

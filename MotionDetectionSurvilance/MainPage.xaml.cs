@@ -1,15 +1,11 @@
 ﻿using MotionDetectionSurvilance.Web;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Mail;
 using System.Threading.Tasks;
-using Windows.Foundation;
 using Windows.Graphics.Imaging;
-using Windows.Media.MediaProperties;
 using Windows.Storage;
-using Windows.Storage.FileProperties;
-using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -30,6 +26,10 @@ namespace MotionDetectionSurvilance
         private MotionDetectorFactory MotionDetectorFactory;
 
         private NetworkManager NetworkManager;
+        private EmailCredentials EmailCredentials;
+
+        TextBox[] subEmail;
+
 
         public MainPage()
         {
@@ -52,35 +52,76 @@ namespace MotionDetectionSurvilance
 
             MotionDetectorFactory = new MotionDetectorFactory(Camera, MotionDataCollection);
             MotionDetectorFactory.ImageCaptured += UpdateUI;
-            MotionDetectorFactory.ImageCaptured += SendNotification;
             MotionDetectorFactory.ImageCaptured += SaveImage;
+            MotionDetectorFactory.ImageCaptured += SendNotificationAndEmail;
 
             Task.Factory.StartNew(() => NetworkManager.Start());
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
 
-            CreateFakeEmails();
+            EmailCredentials = EmailCredentials.GetValues() ?? new EmailCredentials();
+            textBoxEmail.Text = EmailCredentials.FromEmail;
+            textBoxPassword.Text = EmailCredentials.Password;
+
+            subEmail = new TextBox[] { subEmail1, subEmail2, subEmail3, subEmail4 };
+            ShowSubEmail();
         }
 
-        private void CreateFakeEmails()
+        private void ShowSubEmail()
         {
-            EmailData.EmailList = new List<EmailData>();
-            EmailData.EmailList.Add(new EmailData("ankur.nigam198@live.com"));
+            EmailData[] x = EmailData.EmailList;
+            for (int i = 0; i < subEmail.Length && i < x.Length; i++)
+            {
+                subEmail[i].Text = x[i].EmailTo;
+            }
         }
 
         private async void SaveImage(object sender, MotionResult e)
         {
-            int notification = 999999;
-            bool? isNotification = false;
-            await runOnUIThread(() => { notification = (int)NotificationAt.Value; isNotification = NotificationEnable.IsChecked; });
-            if (e.Difference > notification && isNotification == true)
+            if (await ShouldSendNotification(e.Difference))
             {
                 MotionDetectorFactory.SaveImage();
                 Debug.WriteLine("Image Captured");
             }
+        }
+
+        private void SendNotificationAndEmail(object sender, MotionResult e)
+        {
+            new Task(async () =>
+            {
+                if (await ShouldSendNotification(e.Difference))
+                {
+                    //big movement occured
+                    SubscribeNotificationData.sendNotificationToAll();
+                    EmailData.SendEmailToAll();
+                    MotionDetectorFactory.ImageCaptured -= SendNotificationAndEmail;
+                    Task.Delay(5000).Wait();
+                    MotionDetectorFactory.ImageCaptured += SendNotificationAndEmail;
+                }
+            }).Start();
+        }
+
+        private async Task<bool> ShouldSendNotification(int value)
+        {
+            int notification = 999999;
+            bool? isNotification = false;
+            await runOnUIThread(() =>
+            {
+                notification = (int)NotificationAt.Value;
+                isNotification = NotificationEnable.IsChecked;
+            });
+
+            return value > notification && isNotification == true;
+        }
+
+        private async void UpdateUI(object sender, MotionResult e)
+        {
+            UpdatePrevToResult(e.Image);
+            ShowMessage(e.Difference.ToString());
+            CaptureImage();
 
             await runOnUIThread(() =>
             {
-                if (e.Difference > notification)
+                if (e.Difference > NotificationAt.Value)
                 {
                     NotificationControl.Background = new SolidColorBrush(Color.FromArgb(255, 244, 217, 66));
                 }
@@ -89,35 +130,6 @@ namespace MotionDetectionSurvilance
                     NotificationControl.Background = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
                 }
             });
-        }
-
-
-        private void SendNotification(object sender, MotionResult e)
-        {
-            new Task(async () =>
-            {
-                int notification = 999999;
-                bool? isNotification = false;
-                await runOnUIThread(() => { notification = (int)NotificationAt.Value; isNotification = NotificationEnable.IsChecked; });
-                if (e.Difference > notification && isNotification == true)
-                {
-                    //big movement occured
-                    SubscribeNotificationData.sendNotificationToAll();
-                    EmailData.SendEmailToAll();
-                    MotionDetectorFactory.ImageCaptured -= SendNotification;
-                    Task.Delay(5000).Wait();
-                    MotionDetectorFactory.ImageCaptured += SendNotification;
-                }
-            }).Start();
-        }
-
-        private void UpdateUI(object sender, MotionResult e)
-        {
-            UpdatePrevToResult(e.Image);
-            ShowMessage(e.Difference.ToString());
-            CaptureImage();
-
-
         }
 
         private async void UpdatePrevToResult(SoftwareBitmap image)
@@ -163,9 +175,8 @@ namespace MotionDetectionSurvilance
 
         private void CameraPreview_PreviewStatusChanged(object sender, bool preview)
         {
-            //StartPreview.Content = $"{(preview ? "Stop" : "Start")} preview";
-            //CamerasList.IsEnabled = !preview;
             BtnCapture.IsEnabled = preview;
+            btnCredentials.IsEnabled = !preview;
         }
 
         private void CamerasList_DoubleTapped(object sender, Windows.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
@@ -183,11 +194,7 @@ namespace MotionDetectionSurvilance
 
         private void BtnCapture_Click(object sender, RoutedEventArgs e)
         {
-            //TODO: make it to click image automatically
-
             isMonitoring = !isMonitoring;
-            //await CaptureImage();
-
 
             if (isMonitoring)
             {
@@ -234,9 +241,44 @@ namespace MotionDetectionSurvilance
             await ApplicationData.Current.ClearAsync();
         }
 
-        private void HyperlinkButton_Click(object sender, RoutedEventArgs e)
+        private async void UpdateEmailCredentials(object sender, RoutedEventArgs e)
         {
-            this.Frame.Navigate(typeof(EmailCredentials));
+            await runOnUIThread(() =>
+            {
+                btnCredentials.Flyout.Hide();
+            });
+            EmailCredentials.FromEmail = textBoxEmail.Text;
+            EmailCredentials.Password = textBoxPassword.Text;
+
+            var x = new List<EmailData>();
+
+            foreach (var sub in subEmail)
+            {
+                if (isValidMail(sub.Text))
+                {
+                    x.Add(new EmailData(sub.Text));
+                }
+                else
+                {
+                    sub.Text = "";
+                }
+            }
+
+            EmailData.EmailList = x.ToArray();
+
+            bool isValidMail(string email)
+            {
+                try
+                {
+                    new MailAddress(email);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                    throw;
+                }
+            }
         }
     }
 }

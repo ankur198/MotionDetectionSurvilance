@@ -24,9 +24,26 @@
 
             <StackPanel Orientation="Vertical">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
-                    <HyperlinkButton Content="Set Credentials" HorizontalAlignment="Center" Click="HyperlinkButton_Click"/>
+                    <Button Name="btnCredentials" Content="Email">
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel>
+                                    <TextBlock MaxWidth="200" TextWrapping="WrapWholeWords">
+                                        Provide email and password to send email. Email should be hosted on gmail server and <Hyperlink NavigateUri="https://myaccount.google.com/lesssecureapps">this</Hyperlink> should be turned on.
+                                    </TextBlock>
+                                    <TextBox Name="textBoxEmail" PlaceholderText="Email" Margin="5"/>
+                                    <TextBox Name="textBoxPassword" PlaceholderText="Password" Margin="5"/>
+                                    <TextBox Name="subEmail1" PlaceholderText="Email 1" Margin="5"/>
+                                    <TextBox Name="subEmail2" PlaceholderText="Email 2" Margin="5"/>
+                                    <TextBox Name="subEmail3" PlaceholderText="Email 3" Margin="5"/>
+                                    <TextBox Name="subEmail4" PlaceholderText="Email 4" Margin="5"/>
+                                    <Button Content="Submit" Click="UpdateEmailCredentials" Margin="5"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
                     <Button Name="BtnCapture" Content="Start Monitoring" Click="BtnCapture_Click" Margin="10" IsEnabled="False"/>
-                    <Button Name="BtnReset" Content="Reset Notification Sub" HorizontalAlignment="Center" Margin="10" Click="BtnReset_Click"/>
+                    <Button Name="BtnReset" Content="Reset Notification" Click="BtnReset_Click"/>
                 </StackPanel>
 
                 <ListView Name="CamerasList" ItemsSource="{x:Bind Camera.Cameras}" DoubleTapped="CamerasList_DoubleTapped" >

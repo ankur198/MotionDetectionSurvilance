@@ -9,6 +9,17 @@ Simple UWP app to detect motion based on Last frame comparison. Supports remote 
 - Socket Listener
 - Service Worker
 
+## Screenshots
+
+> Dashboard
+![Web Portal](https://ankur198.github.io/MotionDetectionSurvilance/Photos/image(1).png)
+
+> Email Settings
+![Web Portal](https://ankur198.github.io/MotionDetectionSurvilance/Photos/image(3).png)
+
+> Web Portal
+![Web Portal](https://ankur198.github.io/MotionDetectionSurvilance/Photos/image.png)
+
 
 ## Want to contribute?
 

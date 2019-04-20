@@ -14,6 +14,9 @@ Simple UWP app to detect motion based on Last frame comparison. Supports remote 
 > Dashboard
 ![Web Portal](https://ankur198.github.io/MotionDetectionSurvilance/Photos/image(1).png)
 
+> Web Push
+![Web Portal](https://ankur198.github.io/MotionDetectionSurvilance/Photos/image(2).png)
+
 > Email Settings
 ![Web Portal](https://ankur198.github.io/MotionDetectionSurvilance/Photos/image(3).png)
 

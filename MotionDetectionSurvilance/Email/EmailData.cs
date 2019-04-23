@@ -36,7 +36,14 @@ namespace MotionDetectionSurvilance.Web
 
             foreach (var email in EmailList)
             {
-                email.SendEmail(attachment);
+                try
+                {
+                    email.SendEmail(attachment);
+                }
+                catch (Exception)
+                {
+                    // maybe wrong password, or internet issue
+                }
             }
 
             //streamBitmap.Dispose();

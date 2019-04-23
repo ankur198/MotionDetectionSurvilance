@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Push;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,6 +33,8 @@ namespace MotionDetectionSurvilance
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+            AppCenter.Start("740e8fb5-29ac-47ba-a90e-022ad3b14e77", typeof(Analytics));
+            AppCenter.Start("740e8fb5-29ac-47ba-a90e-022ad3b14e77", typeof(Push));
         }
 
         /// <summary>

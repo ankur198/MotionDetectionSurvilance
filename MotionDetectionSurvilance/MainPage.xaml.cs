@@ -68,24 +68,20 @@ namespace MotionDetectionSurvilance
             subEmail = new TextBox[] { subEmail1, subEmail2, subEmail3, subEmail4 };
             ShowSubEmail();
 
-            //ShowMessage($"Web portal at: {GetLocalIp()}:8081");
+            ShowMessage($"Web portal at: {GetLocalIp()}:8081");
         }
 
-        private void SendEmail(object sender, MotionResult e)
-        {
-            new Task(async () =>
-            {
-                if (await ShouldSendNotification(e.Difference))
-                {
-                    //big movement occured
-                    SubscribeNotificationData.sendNotificationToAll();
-                    EmailData.SendEmailToAll();
-                    MotionDetectorFactory.ImageCaptured -= SendEmail;
-                    Task.Delay(10000).Wait();
-                    MotionDetectorFactory.ImageCaptured += SendEmail;
-                }
-            }).Start();
-        }
+        private void SendEmail(object sender, MotionResult e) => new Task(async () =>
+                                                               {
+                                                                   if (await ShouldSendNotification(e.Difference))
+                                                                   {
+                                                                       //big movement occured
+                                                                       EmailData.SendEmailToAll();
+                                                                       MotionDetectorFactory.ImageCaptured -= SendEmail;
+                                                                       Task.Delay(10000).Wait();
+                                                                       MotionDetectorFactory.ImageCaptured += SendEmail;
+                                                                   }
+                                                               }).Start();
 
         private void ShowSubEmail()
         {
@@ -102,23 +98,21 @@ namespace MotionDetectionSurvilance
             {
                 MotionDetectorFactory.SaveImage();
                 Debug.WriteLine("Image Captured");
-            }
+            };
         }
 
-        private void SendNotification(object sender, MotionResult e)
-        {
-            new Task(async () =>
-            {
-                if (await ShouldSendNotification(e.Difference))
-                {
-                    //big movement occured
-                    SubscribeNotificationData.sendNotificationToAll();
-                    MotionDetectorFactory.ImageCaptured -= SendNotification;
-                    Task.Delay(5000).Wait();
-                    MotionDetectorFactory.ImageCaptured += SendNotification;
-                }
-            }).Start();
-        }
+
+        private void SendNotification(object sender, MotionResult e) => new Task(async () =>
+                                                                      {
+                                                                          if (await ShouldSendNotification(e.Difference))
+                                                                          {
+                                                                              //big movement occured
+                                                                              SubscribeNotificationData.sendNotificationToAll();
+                                                                              MotionDetectorFactory.ImageCaptured -= SendNotification;
+                                                                              Task.Delay(5000).Wait();
+                                                                              MotionDetectorFactory.ImageCaptured += SendNotification;
+                                                                          }
+                                                                      }).Start();
 
         private async Task<bool> ShouldSendNotification(int value)
         {
@@ -308,10 +302,11 @@ namespace MotionDetectionSurvilance
             if (icp?.NetworkAdapter == null) return null;
             var hostname =
                 NetworkInformation.GetHostNames()
-                    .SingleOrDefault(
+                    .FirstOrDefault(
                         hn =>
-                            hn.IPInformation?.NetworkAdapter != null && hn.IPInformation.NetworkAdapter.NetworkAdapterId
-                            == icp.NetworkAdapter.NetworkAdapterId);
+                            hn.Type == Windows.Networking.HostNameType.Ipv4 &&
+                            hn.IPInformation?.NetworkAdapter != null &&
+                            hn.IPInformation.NetworkAdapter.NetworkAdapterId == icp.NetworkAdapter.NetworkAdapterId);
 
             // the ip address
             return hostname?.CanonicalName;

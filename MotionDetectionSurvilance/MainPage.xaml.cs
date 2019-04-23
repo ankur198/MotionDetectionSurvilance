@@ -55,7 +55,8 @@ namespace MotionDetectionSurvilance
             MotionDetectorFactory = new MotionDetectorFactory(Camera, MotionDataCollection);
             MotionDetectorFactory.ImageCaptured += UpdateUI;
             MotionDetectorFactory.ImageCaptured += SaveImage;
-            MotionDetectorFactory.ImageCaptured += SendNotificationAndEmail;
+            MotionDetectorFactory.ImageCaptured += SendNotification;
+            MotionDetectorFactory.ImageCaptured += SendEmail;
 
             Task.Factory.StartNew(() => NetworkManager.Start());
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
@@ -67,7 +68,23 @@ namespace MotionDetectionSurvilance
             subEmail = new TextBox[] { subEmail1, subEmail2, subEmail3, subEmail4 };
             ShowSubEmail();
 
-            ShowMessage($"Web portal at: {GetLocalIp()}:8081");
+            //ShowMessage($"Web portal at: {GetLocalIp()}:8081");
+        }
+
+        private void SendEmail(object sender, MotionResult e)
+        {
+            new Task(async () =>
+            {
+                if (await ShouldSendNotification(e.Difference))
+                {
+                    //big movement occured
+                    SubscribeNotificationData.sendNotificationToAll();
+                    EmailData.SendEmailToAll();
+                    MotionDetectorFactory.ImageCaptured -= SendEmail;
+                    Task.Delay(10000).Wait();
+                    MotionDetectorFactory.ImageCaptured += SendEmail;
+                }
+            }).Start();
         }
 
         private void ShowSubEmail()
@@ -88,7 +105,7 @@ namespace MotionDetectionSurvilance
             }
         }
 
-        private void SendNotificationAndEmail(object sender, MotionResult e)
+        private void SendNotification(object sender, MotionResult e)
         {
             new Task(async () =>
             {
@@ -96,10 +113,9 @@ namespace MotionDetectionSurvilance
                 {
                     //big movement occured
                     SubscribeNotificationData.sendNotificationToAll();
-                    EmailData.SendEmailToAll();
-                    MotionDetectorFactory.ImageCaptured -= SendNotificationAndEmail;
+                    MotionDetectorFactory.ImageCaptured -= SendNotification;
                     Task.Delay(5000).Wait();
-                    MotionDetectorFactory.ImageCaptured += SendNotificationAndEmail;
+                    MotionDetectorFactory.ImageCaptured += SendNotification;
                 }
             }).Start();
         }

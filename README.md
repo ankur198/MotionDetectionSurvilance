@@ -41,3 +41,12 @@ Any refactoring(especially in XAML) or feature are welcome 😁
 ### **Pre Compiled** (x86/x64 build only)
 
 - Download latest release from [release](https://github.com/ankur198/MotionDetectionSurvilance/releases) (x86/x64 build only)
+
+### **Compiling on own**
+
+Create Resource file (.resw) and name it ApiKey.resw in /MotionDetectionSurvilance directory.
+
+Add following key to it
+
+- AppCenter for ms app center
+- SendGrid for email

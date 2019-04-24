@@ -32,7 +32,7 @@
                                     <TextBox Name="subEmail2" PlaceholderText="Email 2" Margin="5"/>
                                     <TextBox Name="subEmail3" PlaceholderText="Email 3" Margin="5"/>
                                     <TextBox Name="subEmail4" PlaceholderText="Email 4" Margin="5"/>
-                                    <Button Content="Submit" Click="UpdateEmailCredentials" Margin="5"/>
+                                    <Button Content="Submit" Click="UpdateEmailSubs" Margin="5"/>
                                 </StackPanel>
                             </Flyout>
                         </Button.Flyout>

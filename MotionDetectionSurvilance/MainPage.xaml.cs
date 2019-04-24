@@ -250,7 +250,7 @@ namespace MotionDetectionSurvilance
             await ApplicationData.Current.ClearAsync();
         }
 
-        private async void UpdateEmailCredentials(object sender, RoutedEventArgs e)
+        private async void UpdateEmailSubs(object sender, RoutedEventArgs e)
         {
             await runOnUIThread(() =>
             {

@@ -66,6 +66,15 @@ namespace MotionDetectionSurvilance
             ShowMessage($"Web portal at: {GetLocalIp()}:8081");
         }
 
+        private void ShowSubEmail()
+        {
+            EmailData[] x = EmailData.EmailList;
+            for (int i = 0; i < subEmail.Length && i < x.Length; i++)
+            {
+                subEmail[i].Text = x[i].EmailTo;
+            }
+        }
+
         private void SendEmail(object sender, MotionResult e) => new Task(async () =>
                                                                {
                                                                    if (await ShouldSendNotification(e.Difference))
@@ -77,15 +86,6 @@ namespace MotionDetectionSurvilance
                                                                        MotionDetectorFactory.ImageCaptured += SendEmail;
                                                                    }
                                                                }).Start();
-
-        private void ShowSubEmail()
-        {
-            EmailData[] x = EmailData.EmailList;
-            for (int i = 0; i < subEmail.Length && i < x.Length; i++)
-            {
-                subEmail[i].Text = x[i].EmailTo;
-            }
-        }
 
         private async void SaveImage(object sender, MotionResult e)
         {

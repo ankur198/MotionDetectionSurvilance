@@ -33,8 +33,9 @@ namespace MotionDetectionSurvilance
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
-            AppCenter.Start("740e8fb5-29ac-47ba-a90e-022ad3b14e77", typeof(Analytics));
-            AppCenter.Start("740e8fb5-29ac-47ba-a90e-022ad3b14e77", typeof(Push));
+            var AppCenterToken = new Windows.ApplicationModel.Resources.ResourceLoader("ApiKey").GetString("AppCenter");
+            AppCenter.Start(AppCenterToken, typeof(Analytics));
+            AppCenter.Start(AppCenterToken, typeof(Push));
         }
 
         /// <summary>

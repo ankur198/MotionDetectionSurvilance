@@ -1,5 +1,6 @@
 ﻿using Microsoft.AppCenter;
 using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 using Microsoft.AppCenter.Push;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,7 @@ namespace MotionDetectionSurvilance
             this.Suspending += OnSuspending;
             var AppCenterToken = new Windows.ApplicationModel.Resources.ResourceLoader("ApiKey").GetString("AppCenter");
             AppCenter.Start(AppCenterToken, typeof(Analytics));
+            AppCenter.Start(AppCenterToken, typeof(Crashes));
             AppCenter.Start(AppCenterToken, typeof(Push));
         }
 

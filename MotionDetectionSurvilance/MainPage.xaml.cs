@@ -28,7 +28,6 @@ namespace MotionDetectionSurvilance
         private MotionDetectorFactory MotionDetectorFactory;
 
         private NetworkManager NetworkManager;
-        private EmailCredentials EmailCredentials;
 
         TextBox[] subEmail;
 
@@ -60,10 +59,6 @@ namespace MotionDetectionSurvilance
 
             Task.Factory.StartNew(() => NetworkManager.Start());
             NetworkManager.UpdateSettings += NetworkManager_UpdateSettings;
-
-            EmailCredentials = EmailCredentials.GetValues() ?? new EmailCredentials();
-            textBoxEmail.Text = EmailCredentials.FromEmail;
-            textBoxPassword.Password = EmailCredentials.Password;
 
             subEmail = new TextBox[] { subEmail1, subEmail2, subEmail3, subEmail4 };
             ShowSubEmail();
@@ -261,8 +256,6 @@ namespace MotionDetectionSurvilance
             {
                 btnCredentials.Flyout.Hide();
             });
-            EmailCredentials.FromEmail = textBoxEmail.Text;
-            EmailCredentials.Password = textBoxPassword.Password;
 
             var x = new List<EmailData>();
 
@@ -299,17 +292,24 @@ namespace MotionDetectionSurvilance
         {
             var icp = NetworkInformation.GetInternetConnectionProfile();
 
-            if (icp?.NetworkAdapter == null) return null;
-            var hostname =
-                NetworkInformation.GetHostNames()
-                    .FirstOrDefault(
-                        hn =>
-                            hn.Type == Windows.Networking.HostNameType.Ipv4 &&
-                            hn.IPInformation?.NetworkAdapter != null &&
-                            hn.IPInformation.NetworkAdapter.NetworkAdapterId == icp.NetworkAdapter.NetworkAdapterId);
+            if (icp?.NetworkAdapter == null) return "";
+            try
+            {
+                var hostname =
+                        NetworkInformation.GetHostNames()
+                            .FirstOrDefault(
+                                hn =>
+                                    hn.Type == Windows.Networking.HostNameType.Ipv4 &&
+                                    hn.IPInformation?.NetworkAdapter != null &&
+                                    hn.IPInformation.NetworkAdapter.NetworkAdapterId == icp.NetworkAdapter.NetworkAdapterId);
 
-            // the ip address
-            return hostname?.CanonicalName;
+                // the ip address
+                return hostname?.CanonicalName;
+            }
+            catch (Exception)
+            {
+                return "";
+            }
         }
     }
 }

@@ -28,11 +28,6 @@
                         <Button.Flyout>
                             <Flyout>
                                 <StackPanel>
-                                    <TextBlock MaxWidth="200" TextWrapping="WrapWholeWords">
-                                        Provide email and password to send email. Email should be hosted on gmail server and <Hyperlink NavigateUri="https://myaccount.google.com/lesssecureapps">this</Hyperlink> should be turned on.
-                                    </TextBlock>
-                                    <TextBox Name="textBoxEmail" PlaceholderText="Email" Margin="5"/>
-                                    <PasswordBox Name="textBoxPassword" PlaceholderText="Password" Margin="5"/>
                                     <TextBox Name="subEmail1" PlaceholderText="Email 1" Margin="5"/>
                                     <TextBox Name="subEmail2" PlaceholderText="Email 2" Margin="5"/>
                                     <TextBox Name="subEmail3" PlaceholderText="Email 3" Margin="5"/>

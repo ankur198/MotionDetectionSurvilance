@@ -48,5 +48,6 @@ Create Resource file (.resw) and name it ApiKey.resw in /MotionDetectionSurvilan
 
 Add following key to it
 
-- AppCenter for ms app center
-- SendGrid for email
+- AppCenter(apikey) for ms app center
+- SendGrid(apikey) for email 
+- FromEmail(email) for sending email

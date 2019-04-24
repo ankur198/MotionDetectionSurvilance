@@ -26,6 +26,7 @@
     <Capability Name="internetClientServer" />
     <Capability Name="privateNetworkClientServer"/>
     <uap:Capability Name="picturesLibrary"/>
+    <Capability Name="internetClient"/>
     <DeviceCapability Name="microphone" />
     <DeviceCapability Name="webcam"/>
   </Capabilities>

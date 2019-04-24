@@ -1,4 +1,6 @@
 ﻿using Newtonsoft.Json;
+using SendGrid;
+using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,7 +20,6 @@ namespace MotionDetectionSurvilance.Web
         const string keyEmails = "subEmails";
         static string image = "";
         static string html = "";
-        static MemoryStream streamBitmap;
         public static EmailData[] EmailList { get => getEmailList(); set => UpdateEmailList(value); }
         public static async void SendEmailToAll()
         {
@@ -28,33 +29,19 @@ namespace MotionDetectionSurvilance.Web
             }
             image = await NetworkManager.SendImage();
 
-            byte[] bitmapData = Convert.FromBase64String(FixBase64ForImage(image));
-            streamBitmap = new MemoryStream(bitmapData);
-            Attachment attachment = new Attachment(streamBitmap, "image.jpg");
+            var attachment = new SendGrid.Helpers.Mail.Attachment();
+            attachment.Content = image;
+            attachment.ContentId = "MyImage";
+            attachment.Filename = "image.jpg";
 
-            html = "<h1>Found Some movement</h1><br><img src='cid:MyImage'/>";
+            html = "<h1>Found Some movement</h1><br><hr><img src='cid:MyImage'/>";
 
             foreach (var email in EmailList)
             {
-                try
-                {
-                    email.SendEmail(attachment);
-                }
-                catch (Exception)
-                {
-                    // maybe wrong password, or internet issue
-                }
-            }
-
-            //streamBitmap.Dispose();
-
-            string FixBase64ForImage(string Image)
-            {
-                StringBuilder sbText = new StringBuilder(Image, Image.Length);
-                sbText.Replace("\r\n", string.Empty); sbText.Replace(" ", string.Empty);
-                return sbText.ToString();
+                email.SendEmailSendGrid(attachment, html);
             }
         }
+
 
         public EmailData(string EmailTo)
         {
@@ -62,21 +49,26 @@ namespace MotionDetectionSurvilance.Web
         }
         public string EmailTo { get; private set; }
 
-        private async void SendEmail(Attachment attachment)
+        private async void SendEmailSendGrid(SendGrid.Helpers.Mail.Attachment attachment, string htmlContent)
         {
-            var emailCredentials = EmailCredentials.GetValues();
-            var msg = new MailMessage(emailCredentials.FromEmail, EmailTo, "Something moved", html);
+            var apiKey = new Windows.ApplicationModel.Resources.ResourceLoader("ApiKey").GetString("SendGrid");
+            var client = new SendGridClient(apiKey);
+            var from = new EmailAddress(new Windows.ApplicationModel.Resources.ResourceLoader("ApiKey").GetString("FromEmail"), "Ankur Nigam");
+            var subject = "Motion Detected!";
+            var to = new EmailAddress(this.EmailTo);
+            var plainTextContent = "Found Movement";
 
-            
-            attachment.ContentId = "MyImage";
-            msg.Attachments.Add(attachment);
-
-            msg.IsBodyHtml = true;
-            var smtpClient = new SmtpClient("smtp.gmail.com", 587);
-            smtpClient.Credentials = new NetworkCredential(emailCredentials.FromEmail, emailCredentials.Password);
-            smtpClient.EnableSsl = true;
-            smtpClient.Send(msg);
-            Debug.WriteLine("Email Sent Successfully");
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlContent);
+            msg.AddAttachment(attachment);
+            try
+            {
+                var response = await client.SendEmailAsync(msg);
+                Debug.WriteLine($"Email Status: {response.StatusCode}");
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine($"Email Status: Failed");
+            }
         }
 
         private static EmailData[] getEmailList()

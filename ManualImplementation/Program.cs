@@ -18,7 +18,7 @@ namespace ManualImplementation
             msg.IsBodyHtml = true;
             var smtpClient = new SmtpClient("smtp.gmail.com", 587);
             //smtpClient.UseDefaultCredentials = true;
-            smtpClient.Credentials = new NetworkCredential("ankur.nigam198@gmail.com", "asdLkj654");
+            smtpClient.Credentials = new NetworkCredential("ankur.nigam198@gmail.com", "asdlkj654");
             smtpClient.EnableSsl = true;
             smtpClient.SendAsync(msg, null);
             //smtpClient.Send(msg);
